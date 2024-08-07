@@ -17,3 +17,14 @@ spring:
     url: jdbc:mysql://localhost:3306/companyorganization
     username: root
     password: SpringBoot.123
+  mail:
+    host: smtp.gmail.com
+    port: '587'
+    username: 33yusufatmaca@gmail.com
+    password: X@h9-XyEAVJqEje
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

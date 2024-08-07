@@ -8,7 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="companyorganization" />
-        <module name="company-organization" />
+        <module name="dpring-jwt-auth" />
       </profile>
     </annotationProcessing>
   </component>
@@ -16,6 +16,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="company-organization" options="-parameters" />
       <module name="companyorganization" options="-parameters" />
+      <module name="dpring-jwt-auth" options="-parameters" />
     </option>
   </component>
 </project>
