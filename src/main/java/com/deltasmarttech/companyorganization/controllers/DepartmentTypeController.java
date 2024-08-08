@@ -10,27 +10,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class DepartmentTypeController {
 
 	@Autowired
-	DepartmentTypeService departmentTypeService;
+	private DepartmentTypeService departmentTypeService;
 
-	@PostMapping("/executive/department-types")
-	public ResponseEntity<DepartmentTypeDTO> addDepartmentType(@Valid @RequestBody DepartmentTypeDTO departmentTypeDTO) {
+	@PostMapping("/admin/department-types")
+	public ResponseEntity<DepartmentTypeDTO> createDepartmentType(@Valid @RequestBody DepartmentTypeDTO departmentTypeDTO) {
 
 		DepartmentTypeDTO savedDepartmentTypeDTO = departmentTypeService.createDepartmentType(departmentTypeDTO);
 		return new ResponseEntity<>(savedDepartmentTypeDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/department-types")
+	@GetMapping("/admin/department-types")
 	public ResponseEntity<DepartmentTypeResponse> getAllDepartmentTypes() {
 
 		DepartmentTypeResponse allDepartmentTypesResponse = departmentTypeService.getAllDepartmentTypes();
 		return new ResponseEntity<>(allDepartmentTypesResponse, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/executive/department-types/{departmentTypeId}")
+	@DeleteMapping("/admin/department-types/{departmentTypeId}")
 	public ResponseEntity<DepartmentTypeDTO> deleteDepartmentType(@PathVariable Integer departmentTypeId) {
 
 		DepartmentTypeDTO deletedDepartmentTypeDTO = departmentTypeService.deleteDepartmentType(departmentTypeId);

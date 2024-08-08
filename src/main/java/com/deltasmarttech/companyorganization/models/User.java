@@ -47,7 +47,7 @@ public class User implements UserDetails {
 
     private boolean enabled;
 
-    private boolean active = true;
+    private boolean active;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

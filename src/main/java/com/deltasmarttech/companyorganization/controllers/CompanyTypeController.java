@@ -1,4 +1,4 @@
-package com.deltasmarttech.companyorganization.controller;
+package com.deltasmarttech.companyorganization.controllers;
 
 import com.deltasmarttech.companyorganization.payloads.CompanyTypeDTO;
 import com.deltasmarttech.companyorganization.payloads.CompanyTypeResponse;
@@ -10,26 +10,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class CompanyTypeController {
 
 	@Autowired
 	CompanyTypeService companyTypeService;
 
-	@PostMapping("/executive/company-types")
+	@PostMapping("/admin/company-types")
 	public ResponseEntity<CompanyTypeDTO> addCompanyType(@Valid @RequestBody CompanyTypeDTO companyTypeDTO) {
 
 		CompanyTypeDTO savedCompanyTypeDTO = companyTypeService.createCompanyType(companyTypeDTO);
 		return new ResponseEntity<>(savedCompanyTypeDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/company-types")
+	@GetMapping("/admin/company-types")
 	public ResponseEntity<CompanyTypeResponse> getAllCompanyTypes() {
 		CompanyTypeResponse allCompanyTypesResponse = companyTypeService.getAllCompanyTypes();
 		return new ResponseEntity<>(allCompanyTypesResponse, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/executive/company-types/{companyTypeId}")
+	@DeleteMapping("/admin/company-types/{companyTypeId}")
 	public ResponseEntity<CompanyTypeDTO> deleteCompanyType(@PathVariable Integer companyTypeId) {
 
 		CompanyTypeDTO deleteCompanyTypeDTO = companyTypeService.deleteCompanyType(companyTypeId);

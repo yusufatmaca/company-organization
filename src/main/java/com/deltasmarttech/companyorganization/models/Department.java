@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -41,11 +42,13 @@ public class Department {
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
-
 	private LocalDateTime deletedAt;
 
 	@OneToOne
 	@JoinColumn(name = "manager_id")
 	private User manager;
+
+	@OneToMany(mappedBy = "department")
+	private List<User> employees;
 
 }

@@ -3,13 +3,12 @@ package com.deltasmarttech.companyorganization.services;
 import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
 import com.deltasmarttech.companyorganization.models.*;
-import com.deltasmarttech.companyorganization.payloads.CityDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentResponse;
-import com.deltasmarttech.companyorganization.payloads.ManagerDTO;
+import com.deltasmarttech.companyorganization.payloads.*;
 import com.deltasmarttech.companyorganization.repositories.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -104,7 +103,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 	}
 
 	@Override
-	public DepartmentDTO addManager(ManagerDTO manager, Integer companyId, Integer departmentId) {
+	public DepartmentDTO assignManager(ManagerDTO manager, Integer companyId, Integer departmentId) {
 
 
 		Company company = companyRepository.findById(companyId)
@@ -143,8 +142,69 @@ public class DepartmentServiceImpl implements DepartmentService {
 		department.setManager(user);
 		departmentRepository.save(department);
 
+		company.getDepartments().add(department);
+
 		DepartmentDTO deptWithManager = modelMapper.map(department, DepartmentDTO.class);
 		deptWithManager.setManagerName(department.getManager().getFirstName());
 		return deptWithManager;
+	}
+
+	@Override
+	public Department addEmployee(User employee, Department department, Company company) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User manager = userRepository.findByEmail(authentication.getName())
+				.orElse(null);
+		if (!authentication.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER")) ||
+				department.getManager().getId() != manager.getId()) {
+			throw new APIException("You are not authorized to perform this action!");
+		}
+
+		employee.setDepartment(department);
+
+		department.getEmployees().add(employee);
+		departmentRepository.save(department);
+
+		companyRepository.save(company);
+
+		return department;
+	}
+
+	@Override
+	public Department deleteEmployee(User employee, Department department, Company company) {
+
+
+
+		return department;
+	}
+
+	@Override
+	public DepartmentDTO processEmployee(
+			EmployeeDTO employeeDTO,
+			Integer companyId,
+			Integer departmentId,
+			Integer operationType) {
+
+		User employee = userRepository.findByEmail(employeeDTO.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email", employeeDTO.getEmail()));
+
+		Company company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
+
+		Department department = departmentRepository.findById(departmentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Department", "id", departmentId));
+
+		Department updatedDepartment;
+
+		if (operationType == 1) {
+			updatedDepartment = addEmployee(employee, department, company);
+		} else if (operationType == 2) {
+			updatedDepartment = deleteEmployee(employee, department, company);
+		} else {
+			throw new APIException("Please enter an invalid operation type!");
+		}
+
+		return modelMapper.map(updatedDepartment, DepartmentDTO.class);
 	}
 }

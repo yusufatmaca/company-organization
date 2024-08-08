@@ -3,19 +3,23 @@ package com.deltasmarttech.companyorganization.services;
 import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
 import com.deltasmarttech.companyorganization.models.*;
+import com.deltasmarttech.companyorganization.payloads.DeleteUserDTO;
 import com.deltasmarttech.companyorganization.payloads.VerifyDTO;
 import com.deltasmarttech.companyorganization.repositories.RoleRepository;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import com.deltasmarttech.companyorganization.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,6 +39,8 @@ public class AuthenticationService {
     private final RoleRepository roleRepository;
     @Autowired
     private final MailService mailService;
+    @Autowired
+    private CustomSecurityExpressionRoot securityExpressionRoot;
 
     public AuthenticationResponse register(RegisterRequest request) {
 
@@ -88,6 +94,15 @@ public class AuthenticationService {
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new APIException("The email you entered could not be found in the system."));
+
+        if (!user.isEnabled()) {
+            throw new APIException("Please verify your e-mail address by entering the verification code!");
+        }
+
+        if (!user.isActive()) {
+            throw new APIException("Your account is inactive!");
+        }
+
         try {
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -96,13 +111,7 @@ public class AuthenticationService {
                     )
             );
         } catch (AuthenticationException e) {
-            if (!user.isEnabled()) {
-                throw new APIException("Please verify your e-mail address to enter the verification code!");
-            }
 
-            if (!user.isActive()) {
-                throw new APIException("Your account is inactive!");
-            }
             throw new APIException("Invalid password.");
         }
 
@@ -141,6 +150,30 @@ public class AuthenticationService {
                 .enabled(user.isEnabled())
                 .active(user.isActive())
                 .message("Verification successful!")
+                .build();
+    }
+
+    @PreAuthorize("@customSecurityExpressionRoot.isAdminOrAccountOwner(#userId)")
+    public AuthenticationResponse deleteUser(DeleteUserDTO delete) {
+
+        User user = userRepository.findByEmail(delete.getEmail())
+                .orElseThrow(() -> new APIException("User not found"));
+
+        if (!securityExpressionRoot.isAdminOrAccountOwner(delete.getEmail())) {
+            throw new APIException("You don't have permission to delete this account");
+        }
+
+        user.setActive(false);
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        return AuthenticationResponse.builder()
+                .token(null)
+                .email(user.getEmail())
+                .roleName(user.getRole().getRoleName().name())
+                .enabled(user.isEnabled())
+                .active(user.isActive())
+                .message("Your account has deleted!")
                 .build();
     }
 

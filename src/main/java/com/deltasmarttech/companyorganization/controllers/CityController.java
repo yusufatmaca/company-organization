@@ -40,6 +40,7 @@ public class CityController {
 
 	@DeleteMapping("/admin/cities/{cityId}")
 	public ResponseEntity<CityDTO> deleteCity(@PathVariable Integer cityId) {
+
 		CityDTO deletedCityDTO = cityService.deleteCity(cityId);
 		return new ResponseEntity<>(deletedCityDTO, HttpStatus.OK);
 	}

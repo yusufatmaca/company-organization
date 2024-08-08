@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +18,6 @@ public class DepartmentDTO {
 	private DepartmentTypeDTO departmentType;
 	private String companyName;
 	private String managerName;
+	private List<EmployeeDTO> employees;
 	private boolean active;
 }

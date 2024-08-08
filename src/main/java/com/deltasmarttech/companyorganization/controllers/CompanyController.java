@@ -26,15 +26,11 @@ public class CompanyController {
 		return new ResponseEntity<>(savedCompanyDTO, HttpStatus.CREATED);
 	}
 
-
 	@GetMapping("/admin/companies")
 	public ResponseEntity<CompanyResponse> getAllCompanies(
 			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
-
 			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
-
 			@RequestParam(name="sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
-
 			@RequestParam(name="sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
 
 		CompanyResponse allCompaniesResponse = companyService.getAllCompanies(pageNumber, pageSize, sortBy, sortOrder);
