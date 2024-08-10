@@ -1,5 +1,6 @@
 package com.deltasmarttech.companyorganization.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DepartmentHierarchyId implements Serializable {
 
+	@Column(name = "child_department_id")
 	private Integer childDepartmentId;
+	@Column(name = "parent_department_id")
 	private Integer parentDepartmentId;
 
 }

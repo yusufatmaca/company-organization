@@ -62,6 +62,7 @@ public class DepartmentController {
 		return new ResponseEntity<>(departmentHasAManager, HttpStatus.CREATED);
 	}
 
+	/*
 	@PostMapping("/manager/companies/{companyId}/departments/{departmentId}")
 	public ResponseEntity<DepartmentDTO> addEmployee(
 			@RequestBody EmployeeDTO employee,
@@ -76,5 +77,8 @@ public class DepartmentController {
 				operationType);
 		return new ResponseEntity<>(employeeOperation, HttpStatus.OK);
 	}
+
+	 */
+
 
 }

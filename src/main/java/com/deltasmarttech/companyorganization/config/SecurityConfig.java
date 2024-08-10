@@ -1,5 +1,6 @@
 package com.deltasmarttech.companyorganization.config;
 
+import com.deltasmarttech.companyorganization.exceptions.CustomAccessDeniedHandler;
 import com.deltasmarttech.companyorganization.models.AppRole;
 import com.deltasmarttech.companyorganization.models.Permission;
 import com.deltasmarttech.companyorganization.models.Role;
@@ -29,6 +30,10 @@ import static org.springframework.http.HttpMethod.*;
 public class SecurityConfig{
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+
+    @Autowired
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,6 +75,7 @@ public class SecurityConfig{
                 .sessionManagement((session)->session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DepartmentHierarchyDTO {
 
-	private Integer childDepartmentID;
-	private Integer parentDepartmentID;
+	private Integer parentDepartmentId;
+	private Integer childDepartmentId;
+	private String parentDepartmentName;
+	private String childDepartmentName;
+
 }

@@ -40,7 +40,6 @@ public class Company {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	@CreationTimestamp
 	private LocalDateTime deletedAt;
 
 	@OneToMany(mappedBy = "company")

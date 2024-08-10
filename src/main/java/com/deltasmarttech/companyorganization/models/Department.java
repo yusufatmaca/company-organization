@@ -44,11 +44,8 @@ public class Department {
 	private LocalDateTime createdAt;
 	private LocalDateTime deletedAt;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "manager_id")
 	private User manager;
-
-	@OneToMany(mappedBy = "department")
-	private List<User> employees;
 
 }

@@ -131,6 +131,7 @@ public class CompanyServiceImpl implements CompanyService {
 		company.getDepartments().stream()
 				.forEach(department -> {
 					department.setActive(false);
+					department.setDeletedAt(LocalDateTime.now());
 					departmentRepository.save(department);
 				});
 		Company updatedCompany = companyRepository.save(company);

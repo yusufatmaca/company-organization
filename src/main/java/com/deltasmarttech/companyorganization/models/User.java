@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Builder
@@ -38,9 +39,8 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
+    @OneToMany(mappedBy = "manager")
+    private List<Department> departmentManaged;
 
     @Column(name = "verification_code")
     private String verificationCode;
