@@ -8,11 +8,11 @@
         <version>3.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.intela</groupId>
-    <artifactId>dpring-jwt-auth</artifactId>
+    <groupId>com.deltasmarttech</groupId>
+    <artifactId>companyorganization</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-jwt-auth</name>
-    <description>spring-jwt-auth</description>
+    <name>companyorganization</name>
+    <description>Internship Task</description>
     <properties>
         <java.version>20</java.version>
     </properties>
