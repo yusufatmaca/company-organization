@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = {"*"}, maxAge = 3600)
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class TownController {
 
 	@Autowired
 	private TownService townService;
 
-	@PostMapping("/executive/cities/{cityId}/regions/{regionId}/towns")
+	@PostMapping("/admin/cities/{cityId}/regions/{regionId}/towns")
 	public ResponseEntity<TownDTO> createTown(@Valid @RequestBody TownDTO townDTO, @PathVariable Integer cityId, @PathVariable Integer regionId) {
 
 		TownDTO savedTownDTO = townService.createTown(townDTO, cityId, regionId);
 		return new ResponseEntity<>(savedTownDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/cities/{cityId}/regions/{regionId}/towns")
+	@GetMapping("/public/cities/{cityId}/regions/{regionId}/towns")
 	public ResponseEntity<TownResponse> getAllTownsByRegion(
 			@PathVariable Integer cityId,
 
@@ -43,7 +43,7 @@ public class TownController {
 		return new ResponseEntity<>(allTownsByRegionResponse, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/executive/cities/{cityId}/regions/{regionId}/towns/{townId}")
+	@DeleteMapping("/admin/cities/{cityId}/regions/{regionId}/towns/{townId}")
 	public ResponseEntity<TownDTO> deleteTown(@PathVariable Integer cityId, @PathVariable Integer regionId, @PathVariable Integer townId) {
 
 		TownDTO deletedTownDTO = townService.deleteTown(cityId, regionId, townId);

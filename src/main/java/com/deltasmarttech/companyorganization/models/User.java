@@ -25,35 +25,34 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String firstName;
-    private String lastName;
-
-    @Column(unique = true, nullable = false)
-    @Email
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy = "manager")
-    private List<Department> departmentManaged;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinColumn(name = "department_id")
+    private Department department;
 
-    @Column(name = "verification_code")
-    private String verificationCode;
+    private String name;
+    private String surname;
 
+    @Column(unique = true, nullable = false)
+    @Email
+    private String email;
+
+    @Column(nullable = true)
+    private String password;
     private boolean enabled;
-
     private boolean active;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
     private LocalDateTime deletedAt;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -28,11 +28,8 @@ public class CityController {
 	@GetMapping("/public/cities")
 	public ResponseEntity<CityResponse> getAllCities(
 			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
-
 			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
-
 			@RequestParam(name="sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
-
 			@RequestParam(name="sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
 
 		CityResponse allCitiesResponse = cityService.getAllCities(pageNumber, pageSize, sortBy, sortOrder);

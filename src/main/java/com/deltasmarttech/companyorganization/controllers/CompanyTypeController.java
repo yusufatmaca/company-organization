@@ -23,7 +23,7 @@ public class CompanyTypeController {
 		return new ResponseEntity<>(savedCompanyTypeDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/admin/company-types")
+	@GetMapping("/public/company-types")
 	public ResponseEntity<CompanyTypeResponse> getAllCompanyTypes() {
 		CompanyTypeResponse allCompanyTypesResponse = companyTypeService.getAllCompanyTypes();
 		return new ResponseEntity<>(allCompanyTypesResponse, HttpStatus.OK);

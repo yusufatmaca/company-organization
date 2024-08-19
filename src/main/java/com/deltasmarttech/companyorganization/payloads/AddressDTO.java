@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ManagerDTO {
+public class AddressDTO {
 
-	private Integer id;
-	private String email;
-
+    private Integer id;
+    private String cityName;
+    private String regionName;
+    private String townName;
+    
 }

@@ -110,7 +110,6 @@ public class CompanyServiceImpl implements CompanyService {
 		companyDTO.setActive(company.isActive());
 		companyDTO.getDepartments().stream()
 				.forEach(department -> {
-					department.setAddress(modelMapper.map(company.getTown().getRegion().getCity(), CityDTO.class));
 				});
 
 		return companyDTO;
@@ -122,7 +121,7 @@ public class CompanyServiceImpl implements CompanyService {
 		Company company = companyRepository.findById(companyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
 
-		if(company.isActive() == false) {
+		if(!company.isActive()) {
 			throw new APIException(company.getName() + " is already passive!");
 		}
 

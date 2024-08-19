@@ -5,7 +5,6 @@ import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundExcepti
 import com.deltasmarttech.companyorganization.models.*;
 import com.deltasmarttech.companyorganization.payloads.*;
 import com.deltasmarttech.companyorganization.repositories.*;
-import org.apache.catalina.Manager;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,7 +37,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 	private ModelMapper modelMapper;
 
 	@Override
-	public DepartmentDTO createDepartment(DepartmentDTO departmentDTO, Integer companyId, Integer departmentTypeId, Integer townId) {
+	public DepartmentDTO createDepartment(
+			DepartmentDTO departmentDTO,
+			Integer companyId,
+			Integer departmentTypeId,
+			Integer townId) {
 
 		// Does the company exist?
 		Company company = companyRepository.findById(companyId)
@@ -82,8 +85,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 			company.getDepartments().add(department);
 			companyRepository.save(company);
 
-			DepartmentDTO savedDepartmentDTO = modelMapper.map(department, DepartmentDTO.class);
-			savedDepartmentDTO.setAddress(modelMapper.map(department.getTown().getRegion().getCity(), CityDTO.class));
+			DepartmentDTO savedDepartmentDTO = convertToDTO(department);
 
 			return savedDepartmentDTO;
 		} else {
@@ -113,7 +115,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 		List<Department> departments = pageProducts.getContent();
 
 		if(departments.isEmpty()){
-			throw new APIException(company.getName() + " company does not have any products");
+			throw new APIException(company.getName() + " company does not have any departments.");
 		}
 
 		List<DepartmentDTO> departmentDTOS = departments.stream()
@@ -192,20 +194,58 @@ public class DepartmentServiceImpl implements DepartmentService {
 		}
 
 		user.setRole(managerRole);
-		user.getDepartmentManaged().add(department);
+		//user.getDepartmentManaged().add(department);
 		userRepository.save(user);
 
 
-		department.setManager(user);
+		//department.setManager(user);
 		departmentRepository.save(department);
 
 		company.getDepartments().add(department);
 
-		DepartmentDTO deptWithManager = modelMapper.map(department, DepartmentDTO.class);
-		deptWithManager.setManager(modelMapper.map(department.getManager(), ManagerDTO.class));
-		deptWithManager.setAddress(modelMapper.map(department.getTown().getRegion().getCity(), CityDTO.class));
-
+		DepartmentDTO deptWithManager = convertToDTO(department);
 		return deptWithManager;
+	}
+
+	@Override
+	public EmployeeResponse showAllEmployees(
+			Integer companyId,
+			Integer departmentId,
+			Integer pageNumber,
+			Integer pageSize,
+			String sortBy,
+			String sortOrder) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User manager = userRepository.findByEmail(authentication.getName())
+				.orElse(null);
+
+		if(!manager.getRole().getRoleName().name().equalsIgnoreCase("MANAGER")) {
+			throw new APIException("You are not manager! You do not have the right to view this screen.");
+		}
+
+		Company company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
+
+		Department department = departmentRepository.findById(departmentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Department", "id", departmentId));
+
+		if (!company.getDepartments().contains(department)) {
+			throw new APIException("Department does not belong to the specified company");
+		}
+
+		if (!department.getId().equals(manager.getDepartment().getId())) {
+			throw new APIException("You are NOT the manager of " + department.getName() + " department");
+		}
+
+		EmployeeResponse employeeResponse = new EmployeeResponse();
+		List<EmployeeDTO> employeeDTOS = department.getEmployees()
+				.stream()
+				.map(employee -> modelMapper.map(employee, EmployeeDTO.class))
+				.toList();
+		employeeResponse.setEmployees(employeeDTOS);
+
+		return employeeResponse;
 	}
 
 	/*
@@ -291,15 +331,19 @@ public class DepartmentServiceImpl implements DepartmentService {
 	public DepartmentDTO convertToDTO(Department department) {
 
 		DepartmentDTO departmentDTO = new DepartmentDTO();
-
 		departmentDTO.setId(department.getId());
 		departmentDTO.setName(department.getName());
-		departmentDTO.setAddress(modelMapper.map(department.getTown().getRegion().getCity(), CityDTO.class));
+
+		AddressDTO address = new AddressDTO();
+		address.setCityName(department.getTown().getRegion().getCity().getName());
+		address.setRegionName(department.getTown().getRegion().getName());
+		address.setTownName(department.getTown().getName());
+		address.setId(department.getTown().getId());
+		departmentDTO.setAddress(address);
+
 		departmentDTO.setAddressDetail(department.getAddressDetail());
 		departmentDTO.setDepartmentType(modelMapper.map(department.getDepartmentType(), DepartmentTypeDTO.class));
-		if (department.getManager() != null) {
-			departmentDTO.setManager(modelMapper.map(department.getManager(), ManagerDTO.class));
-		}
+		departmentDTO.setManager(getManager(department));
 
 		/*
 		List<EmployeeDTO> employees = department.getEmployees()
@@ -315,4 +359,15 @@ public class DepartmentServiceImpl implements DepartmentService {
 		return departmentDTO;
 	}
 
+	public ManagerDTO getManager(Department department) {
+
+		List<User> employees = department.getEmployees();
+		ManagerDTO manager = null;
+		for (User employee : employees) {
+			if (employee.getRole().getRoleName().name().equals("MANAGER")) {
+				manager = modelMapper.map(employee, ManagerDTO.class);
+			}
+		}
+		return manager;
+	}
 }

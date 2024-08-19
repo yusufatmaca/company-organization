@@ -1,9 +1,6 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.DepartmentDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentResponse;
-import com.deltasmarttech.companyorganization.payloads.EmployeeDTO;
-import com.deltasmarttech.companyorganization.payloads.ManagerDTO;
+import com.deltasmarttech.companyorganization.payloads.*;
 import com.deltasmarttech.companyorganization.services.DepartmentService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import jakarta.validation.Valid;
@@ -11,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = {"*"}, maxAge = 3600)
 @RestController
@@ -31,7 +30,7 @@ public class DepartmentController {
 		return new ResponseEntity<>(savedDepartmentDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/admin/companies/{companyId}/departments")
+	@GetMapping("/public/companies/{companyId}/departments")
 	public ResponseEntity<DepartmentResponse> getAllDepartmentsByCompany(
 			@PathVariable Integer companyId,
 			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
@@ -79,6 +78,27 @@ public class DepartmentController {
 	}
 
 	 */
+
+	@GetMapping("/manager/companies/{companyId}/departments/{departmentId}")
+	public ResponseEntity<EmployeeResponse> showAllEmployees(
+			@PathVariable Integer companyId,
+			@PathVariable Integer departmentId,
+			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+			@RequestParam(name="sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+			@RequestParam(name="sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder
+	) {
+
+		EmployeeResponse employeeResponse = departmentService.showAllEmployees(
+				companyId,
+				departmentId,
+				pageNumber,
+				pageSize,
+				sortBy,
+				sortOrder);
+
+		return new ResponseEntity<>(employeeResponse, HttpStatus.OK);
+	}
 
 
 }

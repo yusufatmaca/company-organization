@@ -27,7 +27,7 @@ public class CompanyController {
 		return new ResponseEntity<>(savedCompanyDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/admin/companies")
+	@GetMapping("/public/companies")
 	public ResponseEntity<CompanyResponse> getAllCompanies(
 			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,

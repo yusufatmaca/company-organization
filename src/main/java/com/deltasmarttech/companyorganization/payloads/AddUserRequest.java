@@ -1,4 +1,4 @@
-package com.deltasmarttech.companyorganization.models;
+package com.deltasmarttech.companyorganization.payloads;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class AddUserRequest {
 
-    private String firstName;
-    private String lastName;
+    private String name;
+    private String surname;
     private String email;
-    private String password;
     private String role;
+    private int companyId;
+    private int departmentId;
 
 }

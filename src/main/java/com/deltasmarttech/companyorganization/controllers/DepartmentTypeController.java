@@ -24,7 +24,7 @@ public class DepartmentTypeController {
 		return new ResponseEntity<>(savedDepartmentTypeDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/admin/department-types")
+	@GetMapping("/public/department-types")
 	public ResponseEntity<DepartmentTypeResponse> getAllDepartmentTypes() {
 
 		DepartmentTypeResponse allDepartmentTypesResponse = departmentTypeService.getAllDepartmentTypes();

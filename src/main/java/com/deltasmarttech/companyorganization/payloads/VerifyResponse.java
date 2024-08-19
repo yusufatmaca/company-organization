@@ -1,15 +1,16 @@
 package com.deltasmarttech.companyorganization.payloads;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class ManagerDTO {
+@NoArgsConstructor
+public class VerifyResponse {
 
-	private Integer id;
-	private String email;
-
+    private String email;
+    private String message;
 }

@@ -29,7 +29,7 @@ public class DepartmentHierarchyController {
         return new ResponseEntity<>(hierarchyDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("/admin/companies/{companyId}")
+    @GetMapping("/public/companies/{companyId}")
     public ResponseEntity<DepartmentHierarchyResponse> getAllDepartmentHierarchyByCompany(
             @PathVariable Integer companyId,
             @RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,

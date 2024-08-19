@@ -13,7 +13,7 @@ public class DepartmentDTO {
 
 	private Integer id;
 	private String name;
-	private CityDTO address;
+	private AddressDTO address;
 	private String addressDetail;
 	private DepartmentTypeDTO departmentType;
 	private ManagerDTO manager;

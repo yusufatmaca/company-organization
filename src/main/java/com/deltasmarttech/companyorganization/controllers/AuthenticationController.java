@@ -1,10 +1,8 @@
 package com.deltasmarttech.companyorganization.controllers;
 
+import com.deltasmarttech.companyorganization.payloads.*;
 import com.deltasmarttech.companyorganization.models.AuthenticateRequest;
 import com.deltasmarttech.companyorganization.models.AuthenticationResponse;
-import com.deltasmarttech.companyorganization.models.RegisterRequest;
-import com.deltasmarttech.companyorganization.payloads.DeleteUserDTO;
-import com.deltasmarttech.companyorganization.payloads.VerifyDTO;
 import com.deltasmarttech.companyorganization.services.AuthenticationService;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +17,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
+
     @Autowired
     private final AuthenticationService authService;
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    @PostMapping("/admin/add-user")
+    public ResponseEntity<AddUserResponse> addUser(
+            @RequestBody AddUserRequest request) {
+        return ResponseEntity.ok(authService.addUser(request));
     }
 
     @PostMapping("/login")
@@ -34,9 +34,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @PostMapping("/verify")
-    public ResponseEntity<AuthenticationResponse> verify(@RequestBody VerifyDTO verify) {
-        return ResponseEntity.ok(authService.verify(verify));
+    @PostMapping("/activate-account")
+    public ResponseEntity<VerifyResponse> activateAccount(@RequestBody ActivateRequest activate) {
+        return ResponseEntity.ok(authService.activateAccount(activate));
     }
 
     @PostMapping("/users/delete")

@@ -37,15 +37,19 @@ public class Department {
 
 	private String addressDetail;
 
-	private boolean active = true;
+	private boolean active;
 
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 	private LocalDateTime deletedAt;
 
-	@ManyToOne
+	@OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<User> employees;
+
+	@OneToOne
 	@JoinColumn(name = "manager_id")
 	private User manager;
+
 
 }

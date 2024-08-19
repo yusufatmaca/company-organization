@@ -1,6 +1,5 @@
 package com.deltasmarttech.companyorganization;
 
-import com.deltasmarttech.companyorganization.models.RegisterRequest;
 import com.deltasmarttech.companyorganization.models.Role;
 import com.deltasmarttech.companyorganization.services.AuthenticationService;
 import org.springframework.boot.CommandLineRunner;

@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = {"*"}, maxAge = 3600)
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class RegionController {
 
 	@Autowired
 	private RegionService regionService;
 
-	@PostMapping("/executive/cities/{cityId}/regions")
+	@PostMapping("/admin/cities/{cityId}/regions")
 	public ResponseEntity<RegionDTO> createRegion(@Valid @RequestBody RegionDTO regionDTO, @PathVariable Integer cityId) {
 
 		RegionDTO savedRegionDTO = regionService.createRegion(regionDTO, cityId);
 		return new ResponseEntity<>(savedRegionDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/cities/{cityId}/regions")
+	@GetMapping("/public/cities/{cityId}/regions")
 	public ResponseEntity<RegionResponse> getAllRegionsByCity(
 			@PathVariable Integer cityId,
 
@@ -41,7 +41,7 @@ public class RegionController {
 		return new ResponseEntity<>(allRegionsByCityResponse, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/executive/cities/{cityId}/regions/{regionId}")
+	@DeleteMapping("/admin/cities/{cityId}/regions/{regionId}")
 	public ResponseEntity<RegionDTO> deleteRegion(@PathVariable Integer regionId) {
 
 		RegionDTO deletedRegionDTO = regionService.deleteRegion(regionId);
