@@ -362,6 +362,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 	public ManagerDTO getManager(Department department) {
 
 		List<User> employees = department.getEmployees();
+		if (employees == null) {
+			return null;
+		}
+
 		ManagerDTO manager = null;
 		for (User employee : employees) {
 			if (employee.getRole().getRoleName().name().equals("MANAGER")) {

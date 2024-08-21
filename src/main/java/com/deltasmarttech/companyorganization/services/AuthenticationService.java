@@ -4,47 +4,61 @@ import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
 import com.deltasmarttech.companyorganization.models.*;
 import com.deltasmarttech.companyorganization.payloads.*;
-import com.deltasmarttech.companyorganization.repositories.CompanyRepository;
-import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
-import com.deltasmarttech.companyorganization.repositories.RoleRepository;
+import com.deltasmarttech.companyorganization.repositories.*;
+import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
-import com.deltasmarttech.companyorganization.repositories.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.mail.MessagingException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor
 public class AuthenticationService {
 
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
-    @Autowired
     private final JwtUtil jwtUtil;
-    @Autowired
     private final AuthenticationManager authManager;
-    @Autowired
     private final RoleRepository roleRepository;
-    @Autowired
     private final MailService mailService;
-    @Autowired
-    private CustomSecurityExpressionRoot securityExpressionRoot;
-    @Autowired
-    private CompanyRepository companyRepository;
-    @Autowired
-    private DepartmentRepository departmentRepository;
+    private final CustomSecurityExpressionRoot securityExpressionRoot;
+    private final CompanyRepository companyRepository;
+    private final DepartmentRepository departmentRepository;
+    private final EmailConfirmationTokenRepository emailConfirmationTokenRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthenticationService(
+            UserRepository userRepository,
+            JwtUtil jwtUtil,
+            AuthenticationManager authManager,
+            RoleRepository roleRepository,
+            MailService mailService,
+            CustomSecurityExpressionRoot securityExpressionRoot,
+            CompanyRepository companyRepository,
+            DepartmentRepository departmentRepository,
+            EmailConfirmationTokenRepository emailConfirmationTokenRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.authManager = authManager;
+        this.roleRepository = roleRepository;
+        this.mailService = mailService;
+        this.securityExpressionRoot = securityExpressionRoot;
+        this.companyRepository = companyRepository;
+        this.departmentRepository = departmentRepository;
+        this.emailConfirmationTokenRepository = emailConfirmationTokenRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     public AddUserResponse addUser(AddUserRequest request) {
 
@@ -73,7 +87,7 @@ public class AuthenticationService {
             appRole = (roleString == null || roleString.isEmpty()) ?
                     AppRole.EMPLOYEE : AppRole.valueOf(roleString.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new APIException("Error: \'" + roleString + "\' is not found!");
+            throw new APIException("Error: '" + roleString + "' is not found!");
         }
 
         Optional<Role> role = roleRepository.findByRoleName(appRole);
@@ -95,7 +109,6 @@ public class AuthenticationService {
         userRepository.save(user);
 
         department.getEmployees().add(user);
-        department.setManager(user);
         departmentRepository.save(department);
 
         company.getDepartments().add(department);
@@ -172,12 +185,13 @@ public class AuthenticationService {
 
     }
 
+    public VerifyResponse activateAccount(ActivateRequest activate) throws MessagingException {
 
-    public VerifyResponse activateAccount(ActivateRequest verify) {
-
-        User user = userRepository.findByEmail(verify.getEmail())
+        // Does the user exist?
+        User user = userRepository.findByEmail(activate.getEmail())
                 .orElseThrow(() -> new APIException("User not found"));
 
+        // Is the user already verified?
         if (user.isEnabled()) {
             throw new APIException("User has been already verified.");
         }
@@ -204,14 +218,16 @@ public class AuthenticationService {
 
          */
 
-        String verificationCode = UUID.randomUUID().toString();
-        user.setVerificationCode(verificationCode);
-        userRepository.save(user);
+        // Generate the token
+        EmailConfirmationToken emailConfirmationToken = createConfirmationToken(user);
 
-        mailService.sendVerificationEmail(user.getEmail(), verificationCode);
-        return null;
+        // Send the token via mail
+        mailService.sendVerificationEmail(emailConfirmationToken);
+        return VerifyResponse.builder()
+                .email(user.getEmail())
+                .message("Please check your email to verify your account and set the password.")
+                .build();
     }
-
 
     @PreAuthorize("@customSecurityExpressionRoot.isAdminOrAccountOwner(#userId)")
     public AuthenticationResponse deleteUser(DeleteUserDTO delete) {
@@ -236,4 +252,99 @@ public class AuthenticationService {
                 .message("Your account has deleted!")
                 .build();
     }
+
+    public AuthenticationResponse setPassword(String verificationCode, PasswordRequest passwordRequest) {
+
+        EmailConfirmationToken emailConfirmationToken = emailConfirmationTokenRepository.findByVerificationCode(verificationCode)
+                .orElseThrow(() -> new APIException("User cannot be found."));
+
+        if (!passwordRequest.getPassword().equals(passwordRequest.getPasswordAgain())) {
+            throw new APIException("The passwords you entered do not match!");
+        }
+
+        if(emailConfirmationToken.isExpired()) {
+            throw new APIException("The shared link for your access has expired.");
+        }
+
+        User user = emailConfirmationToken.getUser();
+        if (!isValidPassword(passwordRequest.getPassword())) {
+            throw new APIException("Your password does not meet the password rules!");
+        }
+
+        emailConfirmationTokenRepository.deleteById(emailConfirmationToken.getId());
+
+        user.setPassword(passwordEncoder.encode(passwordRequest.getPassword()));
+        user.setEnabled(true);
+        userRepository.save(user);
+
+
+
+        return AuthenticationResponse.builder()
+                .token(null)
+                .email(user.getEmail())
+                .roleName(user.getRole().getRoleName().name())
+                .enabled(user.isEnabled())
+                .active(user.isActive())
+                .message("Your account has successfully created!")
+                .build();
+    }
+
+    private boolean isValidPassword(String password) {
+
+        final String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,32}$";
+        final Pattern pattern = Pattern.compile(passwordPattern);
+
+        Matcher matcher = pattern.matcher(password);
+        return matcher.matches();
+
+    }
+
+    private EmailConfirmationToken createConfirmationToken(User user) {
+
+        String verificationCode = UUID.randomUUID().toString();
+        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(user, verificationCode);
+        emailConfirmationTokenRepository.save(emailConfirmationToken);
+        return emailConfirmationToken;
+
+    }
+
+    public AddUserResponse register(CreateAdminRequest request) {
+
+        if(userRepository.findByEmail(request.getEmail()).isPresent())
+            throw new APIException("Error: Email is already in use!");
+
+        /*  If the role is null, then assign "EMPLOYEE"
+            If the role is not valid, then throw an exception
+            If the role is valid, then assign it the `role` field in `User` entity
+        */
+        String roleString = request.getRole();
+        AppRole appRole;
+        try {
+            appRole = (roleString == null || roleString.isEmpty()) ?
+                    AppRole.EMPLOYEE : AppRole.valueOf(roleString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new APIException("Error: \'" + roleString + "\' is not found!");
+        }
+
+        Optional<Role> role = roleRepository.findByRoleName(appRole);
+
+
+        User user = User.builder()
+                .name(request.getName())
+                .surname(request.getSurname())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .enabled(true)
+                .active(true)
+                .role(role.get())
+                .build();
+        userRepository.save(user);
+
+
+        return AddUserResponse.builder()
+                .email(request.getEmail())
+                .role(appRole.name())
+                .build();
+    }
+
 }

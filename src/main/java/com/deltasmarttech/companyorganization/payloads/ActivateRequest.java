@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ActivateRequest {
 
+    // A new user must enter his/her email to be sent verify message.
     private String email;
 }

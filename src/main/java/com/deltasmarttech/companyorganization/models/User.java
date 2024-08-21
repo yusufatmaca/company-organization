@@ -1,11 +1,9 @@
 package com.deltasmarttech.companyorganization.models;
 
+import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,8 +49,9 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    @Column(name = "verification_code")
-    private String verificationCode;
+    @ToString.Exclude
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private EmailConfirmationToken emailConfirmationToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

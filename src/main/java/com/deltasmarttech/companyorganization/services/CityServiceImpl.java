@@ -81,6 +81,7 @@ public class CityServiceImpl implements CityService {
 
 	@Override
 	public CityDTO deleteCity(Integer cityId) {
+
 		City city = cityRepository.findById(cityId)
 				.orElseThrow(() -> new ResourceNotFoundException("City", "id", cityId));
 
