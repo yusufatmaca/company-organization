@@ -8,13 +8,13 @@ import com.deltasmarttech.companyorganization.repositories.*;
 import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -196,33 +196,12 @@ public class AuthenticationService {
             throw new APIException("User has been already verified.");
         }
 
-        /* if (user.getVerificationCode() != null) {
-            if (user.getVerificationCode().equals(verify.getVerificationCode())) {
-                user.setEnabled(true);
-                user.setVerificationCode(null);
-                userRepository.save(user);
-            } else {
-                throw new APIException("You didn't enter correctly your verification code.");
-            }
-        } else {
-            throw new APIException("You already verified your account!");
-        }
-        return AuthenticationResponse.builder()
-                .token(null)
-                .email(user.getEmail())
-                .roleName(user.getRole().getRoleName().name())
-                .enabled(user.isEnabled())
-                .active(user.isActive())
-                .message("Verification successful!")
-                .build();
-
-         */
-
         // Generate the token
-        EmailConfirmationToken emailConfirmationToken = createConfirmationToken(user);
+        EmailConfirmationToken emailConfirmationToken = createToken(user);
 
         // Send the token via mail
         mailService.sendVerificationEmail(emailConfirmationToken);
+
         return VerifyResponse.builder()
                 .email(user.getEmail())
                 .message("Please check your email to verify your account and set the password.")
@@ -253,30 +232,38 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse setPassword(String verificationCode, PasswordRequest passwordRequest) {
+    @Transactional
+    public AuthenticationResponse setPassword(String verificationCode, PasswordRequest passwordRequest, Integer type) {
 
         EmailConfirmationToken emailConfirmationToken = emailConfirmationTokenRepository.findByVerificationCode(verificationCode)
-                .orElseThrow(() -> new APIException("User cannot be found."));
+                .orElseThrow(() -> new APIException("This token is not valid."));
+
+        if(type == 1 && emailConfirmationToken.getUser().isEnabled()) {
+            throw new APIException("You already activated your account.");
+        }
 
         if (!passwordRequest.getPassword().equals(passwordRequest.getPasswordAgain())) {
             throw new APIException("The passwords you entered do not match!");
         }
 
+        User user = emailConfirmationToken.getUser();
+
         if(emailConfirmationToken.isExpired()) {
-            throw new APIException("The shared link for your access has expired.");
+            throw new APIException("The shared link for your access has expired. Please send again verification code.");
         }
 
-        User user = emailConfirmationToken.getUser();
         if (!isValidPassword(passwordRequest.getPassword())) {
             throw new APIException("Your password does not meet the password rules!");
         }
 
-        emailConfirmationTokenRepository.deleteById(emailConfirmationToken.getId());
+        if (passwordEncoder.matches(passwordRequest.getPassword(), user.getPassword())) {
+            throw new APIException("The new password cannot be the same as the old password!");
+        }
 
         user.setPassword(passwordEncoder.encode(passwordRequest.getPassword()));
         user.setEnabled(true);
+        user.setEmailConfirmationToken(null);
         userRepository.save(user);
-
 
         return AuthenticationResponse.builder()
                 .token(null)
@@ -284,7 +271,7 @@ public class AuthenticationService {
                 .roleName(user.getRole().getRoleName().name())
                 .enabled(user.isEnabled())
                 .active(user.isActive())
-                .message("Your account has successfully created!")
+                .message(user.getName() + " has set successfully password.")
                 .build();
     }
 
@@ -295,15 +282,6 @@ public class AuthenticationService {
 
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
-
-    }
-
-    private EmailConfirmationToken createConfirmationToken(User user) {
-
-        String verificationCode = UUID.randomUUID().toString();
-        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(user, verificationCode);
-        emailConfirmationTokenRepository.save(emailConfirmationToken);
-        return emailConfirmationToken;
 
     }
 
@@ -327,7 +305,6 @@ public class AuthenticationService {
 
         Optional<Role> role = roleRepository.findByRoleName(appRole);
 
-
         User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -346,4 +323,55 @@ public class AuthenticationService {
                 .build();
     }
 
+    public VerifyResponse resetPassword(ResetPasswordRequest resetPasswordRequest) throws MessagingException {
+
+        User user = userRepository.findByEmail(resetPasswordRequest.getEmail())
+                .orElseThrow(() -> new APIException("User not found"));
+
+        if (!user.isEnabled()) {
+            throw new APIException("User has not been verified. Please first verify your account.");
+        }
+
+        Optional<EmailConfirmationToken> checkExist = emailConfirmationTokenRepository.findByUserId(user.getId());
+
+        if (checkExist.isPresent()) {
+            if (checkExist.get().isExpired()) {
+                user.setEmailConfirmationToken(null);
+                userRepository.save(user);
+
+            } else {
+                throw new APIException("Verification email has already been sent");
+            }
+        }
+
+        EmailConfirmationToken emailConfirmationToken = createToken(user);
+
+        // Send the token via mail
+        mailService.sendResetPasswordEmail(emailConfirmationToken);
+
+        return VerifyResponse.builder()
+                .email(user.getEmail())
+                .message("Please check your email to reset your password.")
+                .build();
+    }
+
+    private EmailConfirmationToken createToken(User user) {
+
+        Optional<EmailConfirmationToken> existingToken = emailConfirmationTokenRepository.findByUserId(user.getId());
+        if (existingToken.isPresent()) {
+            if (existingToken.get().isExpired()) {
+                user.setEmailConfirmationToken(null);
+                userRepository.save(user);
+            } else {
+                throw new APIException("You already have a pending verification code. Please use the existing code to verify your account before requesting a new one.");
+            }
+
+        }
+
+        String verificationCode = UUID.randomUUID().toString();
+        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(user, verificationCode);
+        emailConfirmationTokenRepository.save(emailConfirmationToken);
+        return emailConfirmationToken;
+
+    }
 }

@@ -1,6 +1,7 @@
 package com.deltasmarttech.companyorganization.exceptions;
 
 import com.deltasmarttech.companyorganization.payloads.APIResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -36,6 +37,12 @@ public class MyGlobalExceptionHandler {
 	public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
 		return new ResponseEntity<>(new APIResponse("Error: " + ex.getMessage(), false), HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+		return new ResponseEntity<>(new APIResponse("Error: " + ex.getRootCause().getMessage(), false), HttpStatus.BAD_REQUEST);
+	}
+
 
 	@ExceptionHandler(APIException.class)
 	public ResponseEntity<APIResponse> myAPIException(APIException e) {

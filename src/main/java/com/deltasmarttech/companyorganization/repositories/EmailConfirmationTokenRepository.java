@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface EmailConfirmationTokenRepository extends JpaRepository<EmailConfirmationToken, Integer> {
 
     Optional<EmailConfirmationToken> findByVerificationCode(String verificationCode);
+    Optional<EmailConfirmationToken> findByUserId(Integer userId);
     EmailConfirmationToken deleteByVerificationCode(String verificationCode);
 
 }

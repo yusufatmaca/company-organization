@@ -28,10 +28,11 @@ public class EmailConfirmationToken {
     private LocalDateTime expiresAt;
 
     public EmailConfirmationToken(User user, String verificationCode) {
+
         this.user = user;
         this.verificationCode = verificationCode;
         this.createdAt = LocalDateTime.now();
-        this.expiresAt = this.createdAt.plusMinutes(15);
+        this.expiresAt = this.createdAt.plusMinutes(1);
     }
 
     public boolean isExpired() {
@@ -41,4 +42,5 @@ public class EmailConfirmationToken {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
 }

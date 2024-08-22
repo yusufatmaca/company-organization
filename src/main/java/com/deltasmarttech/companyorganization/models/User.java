@@ -3,6 +3,7 @@ package com.deltasmarttech.companyorganization.models;
 import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,14 +26,17 @@ public class User implements UserDetails {
     private Integer id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @JoinColumn(name = "department_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = true)
     private Department department;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String surname;
 
     @Column(unique = true, nullable = false)
@@ -49,7 +53,6 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    @ToString.Exclude
     @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private EmailConfirmationToken emailConfirmationToken;
 

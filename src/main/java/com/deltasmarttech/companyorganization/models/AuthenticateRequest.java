@@ -1,5 +1,6 @@
 package com.deltasmarttech.companyorganization.models;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticateRequest {
 
+    @NotBlank(message = "Email field must be filled")
     private String email;
+
+    @NotBlank(message = "Password field must be filled")
     private String password;
 }

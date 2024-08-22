@@ -1,11 +1,8 @@
 package com.deltasmarttech.companyorganization.config;
 
 import com.deltasmarttech.companyorganization.exceptions.CustomAccessDeniedHandler;
-import com.deltasmarttech.companyorganization.models.AppRole;
-import com.deltasmarttech.companyorganization.models.Permission;
-import com.deltasmarttech.companyorganization.models.Role;
-import com.deltasmarttech.companyorganization.repositories.RoleRepository;
-import com.deltasmarttech.companyorganization.repositories.UserRepository;
+import com.deltasmarttech.companyorganization.models.*;
+import com.deltasmarttech.companyorganization.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -82,33 +79,37 @@ public class SecurityConfig{
         return http.build();
     }
 
-  @Bean
-  public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-    return args -> {
-        // Retrieve or create roles
-        Role adminRole = roleRepository.findByRoleName(AppRole.ADMIN)
-                .orElseGet(() -> {
-                    Role newAdminRole = new Role(AppRole.ADMIN);
-                    return roleRepository.save(newAdminRole);
-                });
+    @Bean
+    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, CityRepository cityRepository, RegionRepository regionRepository, TownRepository townRepository) {
+
+        return args -> {
+
+            Role adminRole = roleRepository.findByRoleName(AppRole.ADMIN)
+                    .orElseGet(() -> {
+                        Role newAdminRole = new Role(AppRole.ADMIN);
+                        return roleRepository.save(newAdminRole);
+                    });
 
 
-        Role managerRole = roleRepository.findByRoleName(AppRole.MANAGER)
-          .orElseGet(() -> {
-              Role newManagerRole = new Role(AppRole.MANAGER);
-              return roleRepository.save(newManagerRole);
-          });
+            Role managerRole = roleRepository.findByRoleName(AppRole.MANAGER)
+                    .orElseGet(() -> {
+                        Role newManagerRole = new Role(AppRole.MANAGER);
+                        return roleRepository.save(newManagerRole);
+                    });
 
-        Role employeeRole = roleRepository.findByRoleName(AppRole.EMPLOYEE)
-                .orElseGet(() -> {
-                    Role newEmployeeRole = new Role(AppRole.EMPLOYEE);
-                    return roleRepository.save(newEmployeeRole);
-                });
+            Role employeeRole = roleRepository.findByRoleName(AppRole.EMPLOYEE)
+                    .orElseGet(() -> {
+                        Role newEmployeeRole = new Role(AppRole.EMPLOYEE);
+                        return roleRepository.save(newEmployeeRole);
+                    });
 
-        Set<Role> adminRoles = Set.of(adminRole);
-        Set<Role> managerRoles = Set.of(managerRole);
-        Set<Role> employeeRoles = Set.of(employeeRole);
-    };
-  }
+            Set<Role> adminRoles = Set.of(adminRole);
+            Set<Role> managerRoles = Set.of(managerRole);
+            Set<Role> employeeRoles = Set.of(employeeRole);
+
+
+        };
+    }
+
 
 }

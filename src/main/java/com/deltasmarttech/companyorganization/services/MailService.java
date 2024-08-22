@@ -2,6 +2,7 @@ package com.deltasmarttech.companyorganization.services;
 
 import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.AddressException;
@@ -20,28 +21,42 @@ public class MailService {
     @Autowired
     private JavaMailSender mailSender;
 
-
     public void sendVerificationEmail(EmailConfirmationToken emailConfirmationToken)
             throws MessagingException {
-/*
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(emailConfirmationToken.getUser().getUsername());
-        helper.setSubject("Delta Smart Tech. Registration - Confirm your e-mail");
-        helper.setText("<html>" +
-                        "<body>" +
-                        "<h2>Dear "+ emailConfirmationToken.getUser().getName() + ",</h2>"
-                        + "<br /> Please click on below link to confirm your account."
-                        + "<br/> "  + generateConfirmationLink(emailConfirmationToken.getToken())+"" +
-                        "<br/> Regards,<br/>" +
-                        "Delta Smart Tech." +
-                        "</body>" +
-                        "</html>"
-                , true);
 
-        mailSender.send(message);
+        String subject = "Activate Your Account and Set Password | Delta Smart Tech";
+        String content = "<html>" +
+                    "<body>" +
+                    "<h2>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
+                    "<br /> Please click on the link below to activate your account and set password." +
+                    "<br/><a href='" + generateConfirmationLink(emailConfirmationToken.getVerificationCode(), 1) + "'>Activate your account!</a>" +
+                    "<br/><br/>Regards,<br/>" +
+                    "Delta Smart Tech." +
+                    "</body>" +
+                    "</html>";
 
- */
+        sendMail(emailConfirmationToken, subject, content);
+
+    }
+
+    public void sendResetPasswordEmail(EmailConfirmationToken emailConfirmationToken)
+            throws MessagingException {
+
+        String subject = "Reset Your Password | Delta Smart Tech";
+        String content = "<html>" +
+                "<body>" +
+                "<h2>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
+                "<br /> Please click on the link below to reset your password." +
+                "<br/><a href='" + generateConfirmationLink(emailConfirmationToken.getVerificationCode(), 2) + "'>Reset your password!</a>" +
+                "<br/><br/>Regards,<br/>" +
+                "Delta Smart Tech." +
+                "</body>" +
+                "</html>";
+
+        sendMail(emailConfirmationToken, subject, content);
+    }
+
+    private void sendMail(EmailConfirmationToken emailConfirmationToken, String subject, String content) {
 
         Properties props = new Properties();
         String host = "smtp.gmail.com";
@@ -57,7 +72,6 @@ public class MailService {
 
         Session session = Session.getInstance(props);
 
-
         try {
 
             MimeMessage message = new MimeMessage(session);
@@ -68,17 +82,7 @@ public class MailService {
             InternetAddress toAddress = new InternetAddress(emailConfirmationToken.getUser().getEmail());
             helper.setTo(toAddress);
 
-            helper.setSubject("Delta Smart Tech - Activate Your Account and Set Password");
-
-            String content = "<html>" +
-                    "<body>" +
-                    "<h2>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
-                    "<br /> Please click on the link below to activate your account and set password." +
-                    "<br/><a href='" + generateConfirmationLink(emailConfirmationToken.getVerificationCode()) + "'>Activate your account!</a>" +
-                    "<br/><br/>Regards,<br/>" +
-                    "Delta Smart Tech." +
-                    "</body>" +
-                    "</html>";
+            helper.setSubject(subject);
 
             helper.setText(content, true);
 
@@ -86,13 +90,12 @@ public class MailService {
             transport.connect(host, username, password);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
-        } catch (AddressException ae) {
-            ae.printStackTrace();
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
-    private String generateConfirmationLink(String token) {
-        return "http://localhost:8080/api/v1/auth/set-password?token=" + token ;
+    private String generateConfirmationLink(String token, Integer type) {
+        return "http://localhost:8080/api/v1/auth/set-password?token=" + token + "?type=" + type;
     }
 }

@@ -6,8 +6,7 @@ import com.deltasmarttech.companyorganization.models.AuthenticationResponse;
 import com.deltasmarttech.companyorganization.services.AuthenticationService;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import jakarta.mail.MessagingException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +21,7 @@ public class AuthenticationController {
     private JwtUtil jwtUtil;
 
     public AuthenticationController(AuthenticationService authService, JwtUtil jwtUtil) {
+
         this.authService = authService;
         this.jwtUtil = jwtUtil;
     }
@@ -29,7 +29,7 @@ public class AuthenticationController {
     // An `admin` can add new users, whose role is `manager` or `employee`.
     @PostMapping("/admin/add-user")
     public ResponseEntity<AddUserResponse> addUser(
-            @RequestBody AddUserRequest request) {
+            @RequestBody @Valid AddUserRequest request) {
         return ResponseEntity.ok(authService.addUser(request));
     }
 
@@ -45,8 +45,22 @@ public class AuthenticationController {
     }
 
     @PostMapping("/set-password")
-    public ResponseEntity<AuthenticationResponse> setPassword(@RequestParam("token") String token, @RequestBody PasswordRequest passwordRequest) {
-        return ResponseEntity.ok(authService.setPassword(token, passwordRequest));
+    public ResponseEntity<AuthenticationResponse> setPassword(
+            @RequestParam("token") String token,
+            @RequestParam("type") Integer type,
+            @RequestBody PasswordRequest passwordRequest) {
+
+        /*
+            Type-1 -> activation process
+            Type-2 -> reset password
+         */
+
+        return ResponseEntity.ok(authService.setPassword(token, passwordRequest, type));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<VerifyResponse> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) throws MessagingException {
+        return ResponseEntity.ok(authService.resetPassword(resetPasswordRequest));
     }
 
     @PostMapping("/login")

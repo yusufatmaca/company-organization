@@ -38,7 +38,6 @@
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/services/RegionService.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/services/AuthenticationService.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/models/AuthenticateRequest.java
-/home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/payloads/PasswordResponse.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/models/Region.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/controllers/AuthenticationController.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/repositories/DepartmentRepository.java
@@ -76,6 +75,7 @@
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/services/DepartmentTypeServiceImpl.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/util/AppConstants.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/services/CompanyTypeService.java
+/home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/payloads/ResetPasswordRequest.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/repositories/CityRepository.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/services/CityService.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/models/Company.java
@@ -93,5 +93,6 @@
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/payloads/CompanyDTO.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/repositories/DepartmentHierarchyRepository.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/payloads/DepartmentTypeDTO.java
+/home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/payloads/CreateAdminRequest.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/repositories/CompanyRepository.java
 /home/yusuf/Desktop/Delta Technologies/company-organization/src/main/java/com/deltasmarttech/companyorganization/payloads/DepartmentTypeResponse.java
