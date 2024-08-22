@@ -34,10 +34,10 @@ public class Town {
 	private LocalDateTime createdAt;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "town")
+	@OneToMany(mappedBy = "town", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Company> companies;
 
-	@OneToMany(mappedBy = "town")
+	@OneToMany(mappedBy = "town", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Department> departments;
 
 	@PrePersist

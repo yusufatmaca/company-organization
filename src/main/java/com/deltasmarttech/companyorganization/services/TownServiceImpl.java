@@ -7,9 +7,7 @@ import com.deltasmarttech.companyorganization.models.Region;
 import com.deltasmarttech.companyorganization.models.Town;
 import com.deltasmarttech.companyorganization.payloads.TownDTO;
 import com.deltasmarttech.companyorganization.payloads.TownResponse;
-import com.deltasmarttech.companyorganization.repositories.CityRepository;
-import com.deltasmarttech.companyorganization.repositories.RegionRepository;
-import com.deltasmarttech.companyorganization.repositories.TownRepository;
+import com.deltasmarttech.companyorganization.repositories.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +25,22 @@ import java.util.stream.Collectors;
 public class TownServiceImpl implements TownService {
 
 	@Autowired
-	CityRepository cityRepository;
+	private CityRepository cityRepository;
 
 	@Autowired
-	RegionRepository regionRepository;
+	private RegionRepository regionRepository;
 
 	@Autowired
-	TownRepository townRepository;
+	private TownRepository townRepository;
 
 	@Autowired
-	ModelMapper modelMapper;
+	private ModelMapper modelMapper;
+
+	@Autowired
+	private DepartmentRepository departmentRepository;
+
+	@Autowired
+	private CompanyRepository companyRepository;
 
 	@Transactional
 	@Override
@@ -112,6 +116,7 @@ public class TownServiceImpl implements TownService {
 	}
 
 	@Override
+	@Transactional
 	public TownDTO deleteTown(Integer cityId, Integer regionId, Integer townId) {
 
 		City city = cityRepository.findById(cityId)
@@ -131,14 +136,9 @@ public class TownServiceImpl implements TownService {
 			throw new APIException("The specified town does not belong to the specified region");
 		}
 
-		city.getRegions().remove(region);
-		cityRepository.save(city);
-
-		region.getTowns().remove(town);
-		regionRepository.save(region);
-
+		companyRepository.setTownToNull(town);
+		departmentRepository.setTownToNull(town);
 		townRepository.delete(town);
-		regionRepository.deleteById(regionId);
 
 		return modelMapper.map(town, TownDTO.class);
 	}

@@ -3,9 +3,12 @@ package com.deltasmarttech.companyorganization.services;
 import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
 import com.deltasmarttech.companyorganization.models.City;
+import com.deltasmarttech.companyorganization.models.Region;
+import com.deltasmarttech.companyorganization.models.Town;
 import com.deltasmarttech.companyorganization.payloads.CityDTO;
 import com.deltasmarttech.companyorganization.payloads.CityResponse;
 import com.deltasmarttech.companyorganization.repositories.CityRepository;
+import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,9 @@ public class CityServiceImpl implements CityService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+
+	@Autowired
+	private DepartmentRepository departmentRepository;
 
 	@Override
 	public CityDTO createCity(CityDTO cityDTO) {
@@ -85,7 +91,15 @@ public class CityServiceImpl implements CityService {
 		City city = cityRepository.findById(cityId)
 				.orElseThrow(() -> new ResourceNotFoundException("City", "id", cityId));
 
-		cityRepository.deleteById(cityId);
+		for (Region region : city.getRegions()) {
+			for (Town town : region.getTowns()) {
+				departmentRepository.setTownToNull(town);
+			}
+		}
+
+		cityRepository.delete(city);
 		return modelMapper.map(city, CityDTO.class);
 	}
+
+
 }

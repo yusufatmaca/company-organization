@@ -28,7 +28,7 @@ public class Company {
 	@JoinColumn(name = "company_type_id")
 	private CompanyType companyType;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "town_id", nullable = true)
 	private Town town;
 

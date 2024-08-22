@@ -31,8 +31,8 @@ public class Department {
 	@JoinColumn(name = "department_type_id")
 	private DepartmentType departmentType;
 
-	@ManyToOne
-	@JoinColumn(name = "town_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "town_id", nullable = true)
 	private Town town;
 
 	private String addressDetail;
