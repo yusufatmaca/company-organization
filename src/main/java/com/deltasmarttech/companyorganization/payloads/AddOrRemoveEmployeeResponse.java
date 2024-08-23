@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeDTO {
+public class AddOrRemoveEmployeeResponse {
 
+    private String email;
     private String name;
     private String surname;
-    private String email;
+    private String role;
 }

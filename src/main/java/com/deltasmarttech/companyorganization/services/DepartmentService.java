@@ -1,9 +1,9 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.payloads.DepartmentDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentResponse;
-import com.deltasmarttech.companyorganization.payloads.EmployeeResponse;
-import com.deltasmarttech.companyorganization.payloads.ManagerDTO;
+import com.deltasmarttech.companyorganization.models.Company;
+import com.deltasmarttech.companyorganization.models.Department;
+import com.deltasmarttech.companyorganization.models.User;
+import com.deltasmarttech.companyorganization.payloads.*;
 
 public interface DepartmentService {
 
@@ -13,7 +13,7 @@ public interface DepartmentService {
 	DepartmentDTO assignManager(ManagerDTO user, Integer companyId, Integer departmentId);
 
 	EmployeeResponse showAllEmployees(Integer companyId, Integer departmentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
-	//Department addEmployee(User employee, Department department, Company company);
-	//Department deleteEmployee(User employee, Department department, Company company);
-	//DepartmentDTO processEmployee(EmployeeDTO employee, Integer companyId, Integer departmentId, Integer operationType);
+	Department addEmployee(User employee, Department department, Company company);
+	Department deleteEmployee(User employee, Department department, Company company);
+	DepartmentDTO processEmployee(AddOrRemoveEmployeeRequest employee, Integer companyId, Integer departmentId, Integer operationType);
 }

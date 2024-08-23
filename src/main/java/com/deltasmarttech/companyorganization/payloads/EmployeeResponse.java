@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EmployeeResponse {
 
-    private List<EmployeeDTO> employees;
+    private List<AddOrRemoveEmployeeResponse> employees;
 
     //private Integer pageNumber;
     //private Integer pageSize;

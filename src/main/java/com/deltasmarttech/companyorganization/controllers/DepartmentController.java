@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @CrossOrigin(origins = {"*"}, maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1")
@@ -61,10 +59,10 @@ public class DepartmentController {
 		return new ResponseEntity<>(departmentHasAManager, HttpStatus.CREATED);
 	}
 
-	/*
+
 	@PostMapping("/manager/companies/{companyId}/departments/{departmentId}")
 	public ResponseEntity<DepartmentDTO> addEmployee(
-			@RequestBody EmployeeDTO employee,
+			@RequestBody @Valid AddOrRemoveEmployeeRequest employee,
 			@PathVariable Integer companyId,
 			@PathVariable Integer departmentId,
 			@RequestParam(name = "operationType", required = true) Integer operationType) {
@@ -74,10 +72,11 @@ public class DepartmentController {
 				companyId,
 				departmentId,
 				operationType);
+
 		return new ResponseEntity<>(employeeOperation, HttpStatus.OK);
 	}
 
-	 */
+
 
 	@GetMapping("/manager/companies/{companyId}/departments/{departmentId}")
 	public ResponseEntity<EmployeeResponse> showAllEmployees(

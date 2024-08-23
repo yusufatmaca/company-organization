@@ -209,6 +209,8 @@ public class SecurityConfig{
                         return userRepository.save(admin);
                     });
 
+            companyRepository.flush();
+
         };
     }
 

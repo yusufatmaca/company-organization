@@ -16,6 +16,6 @@ public class DepartmentDTO {
 	private AddressDTO address;
 	private String addressDetail;
 	private DepartmentTypeDTO departmentType;
-	private ManagerDTO manager;
 	private boolean active;
+	private List<AddEmployeeResponse> employees;
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = {"*"}, maxAge = 3600)
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1")
 public class AuthenticationController {
 
     private final AuthenticationService authService;
@@ -33,18 +33,18 @@ public class AuthenticationController {
         return ResponseEntity.ok(authService.addUser(request));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<AddUserResponse> register(
             @RequestBody CreateAdminRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
-    @PostMapping("/activate-account")
+    @PostMapping("/auth/activate-account")
     public ResponseEntity<VerifyResponse> activateAccount(@RequestBody ActivateRequest activate) throws MessagingException {
         return ResponseEntity.ok(authService.activateAccount(activate));
     }
 
-    @PostMapping("/set-password")
+    @PostMapping("/auth/set-password")
     public ResponseEntity<AuthenticationResponse> setPassword(
             @RequestParam("token") String token,
             @RequestParam("type") Integer type,
@@ -58,22 +58,22 @@ public class AuthenticationController {
         return ResponseEntity.ok(authService.setPassword(token, passwordRequest, type));
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/auth/reset-password")
     public ResponseEntity<VerifyResponse> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) throws MessagingException {
         return ResponseEntity.ok(authService.resetPassword(resetPasswordRequest));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticateRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @PostMapping("/users/delete")
+    @PostMapping("/auth/users/delete")
     public ResponseEntity<AuthenticationResponse> deleteUser(@RequestBody DeleteUserDTO delete) {
         return ResponseEntity.ok(authService.deleteUser(delete));
     }
 
-    @PostMapping("/users/logout")
+    @PostMapping("/auth/users/logout")
     public ResponseEntity<String> logout() {
 
         ResponseCookie cookie = jwtUtil.getCleanJwtCookie();

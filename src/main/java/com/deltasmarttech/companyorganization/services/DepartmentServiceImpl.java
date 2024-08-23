@@ -145,13 +145,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new APIException("The department does not belong to the given company.");
 		}
 
-		/*
-		department.getEmployees().forEach(employee -> {
-			employee.setDepartment(null);
-			userRepository.save(employee);
-		});
-		 */
-
 		department.setActive(false);
 		department.setDeletedAt(LocalDateTime.now());
 		departmentRepository.save(department);
@@ -217,12 +210,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 			String sortOrder) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		User manager = userRepository.findByEmail(authentication.getName())
+		User managerOrAdmin = userRepository.findByEmail(authentication.getName())
 				.orElse(null);
-
-		if(!manager.getRole().getRoleName().name().equalsIgnoreCase("MANAGER")) {
-			throw new APIException("You are not manager! You do not have the right to view this screen.");
-		}
 
 		Company company = companyRepository.findById(companyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
@@ -234,39 +223,42 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new APIException("Department does not belong to the specified company");
 		}
 
-		if (!department.getId().equals(manager.getDepartment().getId())) {
-			throw new APIException("You are NOT the manager of " + department.getName() + " department");
+		if (!department.getId().equals(managerOrAdmin.getDepartment().getId()) || !managerOrAdmin.getRole().getRoleName().name().equalsIgnoreCase("ADMIN")) {
+			throw new APIException("You do not have permission to access this resource.");
 		}
 
 		EmployeeResponse employeeResponse = new EmployeeResponse();
-		List<EmployeeDTO> employeeDTOS = department.getEmployees()
+		List<AddOrRemoveEmployeeResponse> addOrRemoveEmployeeResponse = department.getEmployees()
 				.stream()
-				.map(employee -> modelMapper.map(employee, EmployeeDTO.class))
+				.map(employee -> {
+					AddOrRemoveEmployeeResponse response = modelMapper.map(employee, AddOrRemoveEmployeeResponse.class);
+					response.setRole(employee.getRole().getRoleName().name());
+					return response;
+				})
 				.toList();
-		employeeResponse.setEmployees(employeeDTOS);
+		employeeResponse.setEmployees(addOrRemoveEmployeeResponse);
 
 		return employeeResponse;
 	}
 
-	/*
+
 	@Override
 	public Department addEmployee(User employee, Department department, Company company) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		User manager = userRepository.findByEmail(authentication.getName())
 				.orElse(null);
-		if (!authentication.getAuthorities().stream()
-				.anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER")) ||
-				department.getManager().getId() != manager.getId()) {
-			throw new APIException("You are not authorized to perform this action!");
+		if (
+				(authentication.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER")) &&
+				department.getManager().getId() == manager.getId()) ||
+				authentication.getAuthorities().stream()
+						.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+
+			employee.setDepartment(department);
+			userRepository.save(employee);
 		}
 
-		employee.setDepartment(department);
-
-		department.getEmployees().add(employee);
-		departmentRepository.save(department);
-
-		companyRepository.save(company);
 
 		return department;
 	}
@@ -301,13 +293,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	public DepartmentDTO processEmployee(
-			EmployeeDTO employeeDTO,
+			AddOrRemoveEmployeeRequest addOrRemoveEmployeeRequest,
 			Integer companyId,
 			Integer departmentId,
-			Integer operationType) {
+			Integer operationType /* Operation Type 1: Add, Operation Type 2: Remove */) {
 
-		User employee = userRepository.findByEmail(employeeDTO.getEmail())
-				.orElseThrow(() -> new ResourceNotFoundException("User", "email", employeeDTO.getEmail()));
+		User employee = userRepository.findByEmail(addOrRemoveEmployeeRequest.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email", addOrRemoveEmployeeRequest.getEmail()));
 
 		Company company = companyRepository.findById(companyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
@@ -327,7 +319,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		return convertToDTO(updatedDepartment);
 	}
- */
+
 	public DepartmentDTO convertToDTO(Department department) {
 
 		DepartmentDTO departmentDTO = new DepartmentDTO();
@@ -343,7 +335,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		departmentDTO.setAddressDetail(department.getAddressDetail());
 		departmentDTO.setDepartmentType(modelMapper.map(department.getDepartmentType(), DepartmentTypeDTO.class));
-		departmentDTO.setManager(getManager(department));
 
 		/*
 		List<EmployeeDTO> employees = department.getEmployees()

@@ -381,7 +381,8 @@ public class AuthenticationService {
                 user.setEmailConfirmationToken(null);
                 userRepository.save(user);
             } else {
-                throw new APIException("You already have a pending verification code. Please use the existing code to verify your account before requesting a new one.");
+                String formattedExpirationTime = formattedDateTime(existingToken.get().getExpiresAt().toString());
+                throw new APIException("You already have a pending verification code to activate your account. You can only receive a new verification code after " + formattedExpirationTime);
             }
 
         }
