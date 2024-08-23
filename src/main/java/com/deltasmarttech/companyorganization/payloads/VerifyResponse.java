@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,4 +15,5 @@ public class VerifyResponse {
 
     private String email;
     private String message;
+    private String expirationTime;
 }

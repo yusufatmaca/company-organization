@@ -24,5 +24,9 @@ public class DepartmentHierarchy {
 	@JoinColumn(name = "parent_department_id")
 	private Department parentDepartment;
 
-
+	public DepartmentHierarchy(Department parentDepartment, Department childDepartment) {
+		this.parentDepartment = parentDepartment;
+		this.childDepartment = childDepartment;
+		id = new DepartmentHierarchyId();
+	}
 }

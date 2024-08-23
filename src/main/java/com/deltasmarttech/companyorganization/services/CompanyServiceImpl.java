@@ -55,10 +55,8 @@ public class CompanyServiceImpl implements CompanyService {
 						new ResourceNotFoundException("Town", "id", townId));
 
 		Company company = modelMapper.map(companyDTO, Company.class);
-		Company savedCompany = companyRepository.findByName(companyDTO.getName());
-		if (savedCompany != null) {
-			throw new APIException("Company with the name \"" + companyDTO.getName() + "\" already exists!");
-		}
+		Company savedCompany = companyRepository.findByName(companyDTO.getName())
+				.orElseThrow(() -> new APIException("Company with the name \"" + companyDTO.getName() + "\" already exists!"));
 
 		company.setCompanyType(companyType);
 		company.setTown(town);

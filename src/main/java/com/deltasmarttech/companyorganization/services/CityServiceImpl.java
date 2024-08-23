@@ -35,10 +35,8 @@ public class CityServiceImpl implements CityService {
 	@Override
 	public CityDTO createCity(CityDTO cityDTO) {
 		City city = modelMapper.map(cityDTO, City.class);
-		City savedCity = cityRepository.findByName(cityDTO.getName());
-		if (savedCity != null) {
-			throw new APIException("City with the name: " + cityDTO.getName() + " already exists!");
-		}
+		City savedCity = cityRepository.findByName(cityDTO.getName())
+				.orElseThrow(() -> new APIException("City with the name: " + cityDTO.getName() + " already exists!"));
 		city.setCreatedAt(LocalDateTime.now());
 		City c = cityRepository.save(city);
 		return modelMapper.map(c, CityDTO.class);

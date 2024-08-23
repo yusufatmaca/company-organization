@@ -21,16 +21,17 @@ public class MailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendVerificationEmail(EmailConfirmationToken emailConfirmationToken)
+    public void sendVerificationEmail(EmailConfirmationToken emailConfirmationToken, String expirationTime)
             throws MessagingException {
 
         String subject = "Activate Your Account and Set Password | Delta Smart Tech";
         String content = "<html>" +
                     "<body>" +
-                    "<h2>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
+                    "<h3>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
                     "<br /> Please click on the link below to activate your account and set password." +
                     "<br/><a href='" + generateConfirmationLink(emailConfirmationToken.getVerificationCode(), 1) + "'>Activate your account!</a>" +
-                    "<br/><br/>Regards,<br/>" +
+                    "<br/>" + "This verification link will expire on " + expirationTime +
+                    "<br/>Regards,<br/>" +
                     "Delta Smart Tech." +
                     "</body>" +
                     "</html>";
@@ -39,15 +40,16 @@ public class MailService {
 
     }
 
-    public void sendResetPasswordEmail(EmailConfirmationToken emailConfirmationToken)
+    public void sendResetPasswordEmail(EmailConfirmationToken emailConfirmationToken, String expirationTime)
             throws MessagingException {
 
         String subject = "Reset Your Password | Delta Smart Tech";
         String content = "<html>" +
                 "<body>" +
-                "<h2>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
+                "<h3>Dear " + emailConfirmationToken.getUser().getName() + ",</h2>" +
                 "<br /> Please click on the link below to reset your password." +
                 "<br/><a href='" + generateConfirmationLink(emailConfirmationToken.getVerificationCode(), 2) + "'>Reset your password!</a>" +
+                "<br/>" + "This verification link will expire on " + expirationTime +
                 "<br/><br/>Regards,<br/>" +
                 "Delta Smart Tech." +
                 "</body>" +

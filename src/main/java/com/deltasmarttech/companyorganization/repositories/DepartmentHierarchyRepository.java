@@ -1,5 +1,6 @@
 package com.deltasmarttech.companyorganization.repositories;
 
+import com.deltasmarttech.companyorganization.models.Department;
 import com.deltasmarttech.companyorganization.models.DepartmentHierarchy;
 import com.deltasmarttech.companyorganization.models.DepartmentHierarchyId;
 import com.deltasmarttech.companyorganization.payloads.RegionResponse;
@@ -10,12 +11,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface DepartmentHierarchyRepository extends JpaRepository<DepartmentHierarchy, DepartmentHierarchyId> {
 
-    Page<DepartmentHierarchy> findByParentDepartmentCompanyIdOrChildDepartmentCompanyId(
-            Integer parentCompanyId,
-            Integer childCompanyId,
-            Pageable pageable
-    );
+    Optional<DepartmentHierarchy> findByParentDepartmentAndChildDepartment(Department parentDepartment, Department childDepartment);
+
+    Page<DepartmentHierarchy> findByParentDepartmentCompanyId(Integer companyId, Pageable pageable);
 }

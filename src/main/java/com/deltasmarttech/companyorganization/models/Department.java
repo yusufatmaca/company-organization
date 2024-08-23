@@ -39,6 +39,15 @@ public class Department {
 
 	private boolean active;
 
+	public Department(String name, Company company, DepartmentType departmentType, Town town, String addressDetail, boolean active) {
+		this.name = name;
+		this.company = company;
+		this.departmentType = departmentType;
+		this.town = town;
+		this.addressDetail = addressDetail;
+		this.active = active;
+	}
+
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;

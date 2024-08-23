@@ -2,6 +2,7 @@ package com.deltasmarttech.companyorganization.util;
 
 
 import com.deltasmarttech.companyorganization.models.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +33,7 @@ public class EmailConfirmationToken {
         this.user = user;
         this.verificationCode = verificationCode;
         this.createdAt = LocalDateTime.now();
-        this.expiresAt = this.createdAt.plusMinutes(1);
+        this.expiresAt = this.createdAt.plusMinutes(15);
     }
 
     public boolean isExpired() {

@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
@@ -64,6 +64,17 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.email;
+    }
+
+    public User(Department department, String name, String surname, String email, String password, boolean enabled, boolean active, Role role) {
+        this.department = department;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.enabled = enabled;
+        this.active = active;
+        this.role = role;
     }
 
     @Override

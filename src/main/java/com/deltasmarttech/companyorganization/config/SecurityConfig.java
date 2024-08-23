@@ -3,6 +3,7 @@ package com.deltasmarttech.companyorganization.config;
 import com.deltasmarttech.companyorganization.exceptions.CustomAccessDeniedHandler;
 import com.deltasmarttech.companyorganization.models.*;
 import com.deltasmarttech.companyorganization.repositories.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -79,17 +80,114 @@ public class SecurityConfig{
         return http.build();
     }
 
+    @Transactional
     @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, CityRepository cityRepository, RegionRepository regionRepository, TownRepository townRepository) {
+    public CommandLineRunner initData(
+            RoleRepository roleRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            CityRepository cityRepository,
+            RegionRepository regionRepository,
+            TownRepository townRepository,
+            CompanyRepository companyRepository,
+            CompanyTypeRepository companyTypeRepository,
+            DepartmentTypeRepository departmentTypeRepository,
+            DepartmentHierarchyRepository departmentHierarchyRepository,
+            DepartmentRepository departmentRepository) {
 
         return args -> {
+
+            // Set<Role> adminRoles = Set.of(adminRole);
+            // Set<Role> managerRoles = Set.of(managerRole);
+            // Set<Role> employeeRoles = Set.of(employeeRole);
+
+            City city = cityRepository.findByName("İzmir")
+                    .orElseGet(() -> {
+                        City izmir = new City("İzmir");
+                        return cityRepository.save(izmir);
+                    });
+
+            Region region = regionRepository.findByName("İzmir Güney")
+                            .orElseGet(() -> {
+                               Region izmirGuney = new Region("İzmir Güney");
+                               izmirGuney.setCity(city);
+                               return regionRepository.save(izmirGuney);
+                            });
+
+            Town town = townRepository.findByName("Urla")
+                            .orElseGet(() -> {
+                               Town urla = new Town("Urla");
+                               urla.setRegion(region);
+                               return townRepository.save(urla);
+                            });
+
+            CompanyType companyType = companyTypeRepository.findByName("Yazılım Geliştirme")
+                            .orElseGet(() -> {
+                                CompanyType yazilimGelistirme = new CompanyType("Yazılım Geliştirme", true);
+                                return companyTypeRepository.save(yazilimGelistirme);
+                            });
+
+            Company company = companyRepository.findByName("Delta Akıllı Teknolojiler A.Ş.")
+                            .orElseGet(() -> {
+                                Company delta = new Company(
+                                        "Delta Akıllı Teknolojiler A.Ş.",
+                                        "Delta",
+                                        companyType,
+                                        "Teknopark İzmir A8 Binası",
+                                        town);
+                               return companyRepository.save(delta);
+                            });
+
+            DepartmentType departmentType1 = departmentTypeRepository.findByName("Yönetsel")
+                    .orElseGet(() -> {
+                       DepartmentType yonetsel = new DepartmentType("Yönetsel", true);
+                        return departmentTypeRepository.save(yonetsel);
+                    });
+
+            DepartmentType departmentType2 = departmentTypeRepository.findByName("Operasyonel")
+                    .orElseGet(() -> {
+                        DepartmentType operasyonel = new DepartmentType("Operasyonel", true);
+                        return departmentTypeRepository.save(operasyonel);
+                    });
+
+            Department department1 = departmentRepository.findByName("Genel Müdürlük")
+                    .orElseGet(() -> {
+                       Department genelMudurluk = new Department(
+                               "Genel Müdürlük",
+                               company,
+                               departmentType1,
+                               town,
+                               "Teknopark İzmir A8 Binası",
+                               true
+                       );
+                       return departmentRepository.save(genelMudurluk);
+                    });
+
+            Department department2 = departmentRepository.findByName("Yazılım Geliştirme")
+                    .orElseGet(() -> {
+                        Department genelMudurluk = new Department(
+                                "Yazılım Geliştirme",
+                                company,
+                                departmentType2,
+                                town,
+                                "Teknopark İzmir A8 Binası",
+                                true
+                        );
+                        return departmentRepository.save(genelMudurluk);
+                    });
+
+            DepartmentHierarchy departmentHierarchy = departmentHierarchyRepository.findByParentDepartmentAndChildDepartment(department1, department2)
+                    .orElseGet(() -> {
+                       DepartmentHierarchy genelMudurlukAndYazilimGelistirme = new DepartmentHierarchy(department1, department2);
+
+                       return departmentHierarchyRepository.save(genelMudurlukAndYazilimGelistirme);
+                    });
 
             Role adminRole = roleRepository.findByRoleName(AppRole.ADMIN)
                     .orElseGet(() -> {
                         Role newAdminRole = new Role(AppRole.ADMIN);
                         return roleRepository.save(newAdminRole);
                     });
-
 
             Role managerRole = roleRepository.findByRoleName(AppRole.MANAGER)
                     .orElseGet(() -> {
@@ -103,10 +201,13 @@ public class SecurityConfig{
                         return roleRepository.save(newEmployeeRole);
                     });
 
-            Set<Role> adminRoles = Set.of(adminRole);
-            Set<Role> managerRoles = Set.of(managerRole);
-            Set<Role> employeeRoles = Set.of(employeeRole);
 
+            User systemAdministrator = userRepository.findByEmail("admin@delta.smart")
+                    .orElseGet(() -> {
+                        User admin = new User(department1, "System", "Administrator", "admin@delta.smart", passwordEncoder.encode("E4c-p7*K"), true, true, adminRole);
+
+                        return userRepository.save(admin);
+                    });
 
         };
     }

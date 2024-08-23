@@ -8,5 +8,10 @@ import org.springframework.stereotype.Repository;
 public interface DepartmentHierarchyService {
 
     DepartmentHierarchyDTO addDepartmentHierarchy(Integer parentDepartmentId, Integer childDepartmentId);
-    DepartmentHierarchyResponse getAllDepartmentHierarchyByCompany(Integer pageNumber, Integer pageSize, Integer size, String sortBy, String sortOrder);
+    DepartmentHierarchyResponse getAllDepartmentHierarchyByCompany(
+            Integer companyId,
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortOrder);
 }

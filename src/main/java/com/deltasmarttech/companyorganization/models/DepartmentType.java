@@ -26,7 +26,12 @@ public class DepartmentType {
 	@NotBlank(message = "Department Type name cannot be left blank!")
 	private String name;
 
-	private boolean active = true;
+	private boolean active;
+
+	public DepartmentType(String name, boolean active) {
+		this.name = name;
+		this.active = active;
+	}
 
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)

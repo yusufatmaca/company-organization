@@ -25,7 +25,13 @@ public class CompanyType {
 	@NotBlank(message = "Company Type name cannot be left blank!")
 	private String name;
 
+
 	private boolean active;
+
+	public CompanyType(String name, boolean active) {
+		this.name = name;
+		this.active = active;
+	}
 
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;

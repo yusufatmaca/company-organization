@@ -109,6 +109,9 @@ public class AuthenticationService {
         userRepository.save(user);
 
         department.getEmployees().add(user);
+        if (appRole.name().equalsIgnoreCase("MANAGER")) {
+            department.setManager(user);
+        }
         departmentRepository.save(department);
 
         company.getDepartments().add(department);
@@ -199,13 +202,29 @@ public class AuthenticationService {
         // Generate the token
         EmailConfirmationToken emailConfirmationToken = createToken(user);
 
+        String formattedExpirationTime = formattedDateTime(emailConfirmationToken.getExpiresAt().toString());
+
         // Send the token via mail
-        mailService.sendVerificationEmail(emailConfirmationToken);
+        mailService.sendVerificationEmail(emailConfirmationToken, formattedExpirationTime);
+
 
         return VerifyResponse.builder()
                 .email(user.getEmail())
                 .message("Please check your email to verify your account and set the password.")
+                .expirationTime(formattedExpirationTime)
                 .build();
+    }
+
+    private String formattedDateTime(String originalDateTime) {
+        String datePart = originalDateTime.substring(0, 10);
+        String timePart = originalDateTime.substring(11, 16);
+
+        String[] dateParts = datePart.split("-");
+        String year = dateParts[0];
+        String month = dateParts[1];
+        String day = dateParts[2];
+
+        return day + "/" + month + "/" + year + " " + timePart;
     }
 
     @PreAuthorize("@customSecurityExpressionRoot.isAdminOrAccountOwner(#userId)")
@@ -240,6 +259,10 @@ public class AuthenticationService {
 
         if(type == 1 && emailConfirmationToken.getUser().isEnabled()) {
             throw new APIException("You already activated your account.");
+        }
+
+        if (type == 2 && !emailConfirmationToken.getUser().isEnabled()) {
+            throw new APIException("First of all, please activate your account.");
         }
 
         if (!passwordRequest.getPassword().equals(passwordRequest.getPasswordAgain())) {
@@ -332,26 +355,21 @@ public class AuthenticationService {
             throw new APIException("User has not been verified. Please first verify your account.");
         }
 
-        Optional<EmailConfirmationToken> checkExist = emailConfirmationTokenRepository.findByUserId(user.getId());
-
-        if (checkExist.isPresent()) {
-            if (checkExist.get().isExpired()) {
-                user.setEmailConfirmationToken(null);
-                userRepository.save(user);
-
-            } else {
-                throw new APIException("Verification email has already been sent");
-            }
+        if (!user.isActive()) {
+            throw new APIException("This account is not active. You cannot reset the password.");
         }
+
+        Optional<EmailConfirmationToken> checkExist = emailConfirmationTokenRepository.findByUserId(user.getId());
 
         EmailConfirmationToken emailConfirmationToken = createToken(user);
 
-        // Send the token via mail
-        mailService.sendResetPasswordEmail(emailConfirmationToken);
+        String formattedExpirationTime = formattedDateTime(emailConfirmationToken.getExpiresAt().toString());
+        mailService.sendResetPasswordEmail(emailConfirmationToken, formattedExpirationTime);
 
         return VerifyResponse.builder()
                 .email(user.getEmail())
-                .message("Please check your email to reset your password.")
+                .message("Please check your email to reset the password.")
+                .expirationTime(formattedExpirationTime)
                 .build();
     }
 

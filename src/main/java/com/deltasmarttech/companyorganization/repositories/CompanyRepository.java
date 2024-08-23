@@ -9,10 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
 
-	Company findByName(String name);
+	Optional<Company> findByName(String name);
 
     @Modifying
     @Transactional

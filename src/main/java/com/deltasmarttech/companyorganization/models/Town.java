@@ -40,9 +40,7 @@ public class Town {
 	@OneToMany(mappedBy = "town", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Department> departments;
 
-	@PrePersist
-	protected void onCreate() {
-		createdAt = LocalDateTime.now();
+	public Town(String name) {
+		this.name = name;
 	}
-
 }

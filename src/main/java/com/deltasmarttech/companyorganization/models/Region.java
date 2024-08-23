@@ -45,4 +45,7 @@ public class Region {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
+	public Region(String name) {
+		this.name = name;
+	}
 }

@@ -25,11 +25,9 @@ public class CompanyTypeServiceImpl implements CompanyTypeService {
 	@Override
 	public CompanyTypeDTO createCompanyType(CompanyTypeDTO companyTypeDTO) {
 		CompanyType companyType = modelMapper.map(companyTypeDTO, CompanyType.class);
-		CompanyType savedCompanyType = companyTypeRepository.findByName(companyTypeDTO.getName());
+		CompanyType savedCompanyType = companyTypeRepository.findByName(companyTypeDTO.getName())
+				.orElseThrow(() -> new APIException("Company Type with the name " + companyType.getName() + " already exists!"));
 
-		if (savedCompanyType != null) {
-			throw new APIException("Company Type with the name " + companyType.getName() + " already exists!");
-		}
 		companyType.setActive(true);
 		CompanyType save = companyTypeRepository.save(companyType);
 		return modelMapper.map(save, CompanyTypeDTO.class);

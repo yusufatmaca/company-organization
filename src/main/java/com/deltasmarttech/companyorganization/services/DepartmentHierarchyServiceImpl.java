@@ -76,11 +76,13 @@ public class DepartmentHierarchyServiceImpl implements DepartmentHierarchyServic
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<DepartmentHierarchy> page = departmentHierarchyRepository
-                .findByParentDepartmentCompanyIdOrChildDepartmentCompanyId(companyId, companyId, pageable);
+                .findByParentDepartmentCompanyId(companyId, pageable);
 
         List<DepartmentHierarchy> departmentHierarchies = page.getContent();
 
-        List<DepartmentHierarchyDTO> departmentHierarchyDTOS = page.getContent().stream().map(departmentHierarchy -> {
+        List<DepartmentHierarchyDTO> departmentHierarchyDTOS = page.getContent()
+                .stream()
+                .map(departmentHierarchy -> {
             DepartmentHierarchyDTO dto = new DepartmentHierarchyDTO();
             dto.setParentDepartmentId(departmentHierarchy.getParentDepartment().getId());
             dto.setChildDepartmentId(departmentHierarchy.getChildDepartment().getId());
@@ -102,20 +104,18 @@ public class DepartmentHierarchyServiceImpl implements DepartmentHierarchyServic
 
     private Sort createSort(String sortBy, String sortOrder) {
 
-        Sort sort;
-        if (sortBy.contains(".")) {
-            String[] parts = sortBy.split("\\.");
-            sort = Sort.by(parts[0]).and(Sort.by(parts[1]));
-        } else {
-            sort = Sort.by(sortBy);
+        String sortField = "id";  // Default to sorting by id
+        if (sortBy != null) {
+            sortField = switch (sortBy.toLowerCase()) {
+                case "name" -> "parentDepartment.name";
+                case "childname" -> "childDepartment.name";
+                case "id" -> "id";
+                default -> "id";
+            };
         }
 
-        if (sortOrder.equalsIgnoreCase(Sort.Direction.DESC.name())) {
-            sort = sort.descending();
-        } else {
-            sort = sort.ascending();
-        }
-
-        return sort;
+        Sort.Direction direction = (sortOrder != null && sortOrder.equalsIgnoreCase("desc"))
+                ? Sort.Direction.DESC : Sort.Direction.ASC;
+        return Sort.by(direction, sortField);
     }
 }

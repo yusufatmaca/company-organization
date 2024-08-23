@@ -26,11 +26,9 @@ public class DepartmentTypeServiceImpl implements DepartmentTypeService {
 	public DepartmentTypeDTO createDepartmentType(DepartmentTypeDTO departmentTypeDTO) {
 
 		DepartmentType departmentType = modelMapper.map(departmentTypeDTO, DepartmentType.class);
-		DepartmentType savedDepartmentType = departmentTypeRepository.findByName(departmentTypeDTO.getName());
+		DepartmentType savedDepartmentType = departmentTypeRepository.findByName(departmentTypeDTO.getName())
+				.orElseThrow(() -> new APIException("Department type with the name " + departmentType.getName() + " already exists!"));
 
-		if (savedDepartmentType != null) {
-			throw new APIException("Department type with the name " + departmentType.getName() + " already exists!");
-		}
 		departmentType.setActive(true);
 		DepartmentType save = departmentTypeRepository.save(departmentType);
 		return modelMapper.map(save, DepartmentTypeDTO.class);
