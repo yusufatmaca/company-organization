@@ -98,6 +98,6 @@ public class MailService {
     }
 
     private String generateConfirmationLink(String token, Integer type) {
-        return "http://localhost:8080/api/v1/auth/set-password?token=" + token + "?type=" + type;
+        return "http://localhost:3000/set-password?token=" + token + "&type=" + type;
     }
 }
