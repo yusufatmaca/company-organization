@@ -4,6 +4,7 @@ import com.deltasmarttech.companyorganization.payloads.APIResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,14 @@ public class MyGlobalExceptionHandler {
 		String message = e.getMessage();
 		APIResponse apiResponse = new APIResponse(message, false);
 		return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("message", ex.getMessage());
+		responseBody.put("status", HttpStatus.FORBIDDEN.value());
+		return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)

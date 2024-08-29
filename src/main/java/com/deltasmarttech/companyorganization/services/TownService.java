@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.payloads.TownDTO;
-import com.deltasmarttech.companyorganization.payloads.TownResponse;
+import com.deltasmarttech.companyorganization.payloads.Address.Town.TownDTO;
+import com.deltasmarttech.companyorganization.payloads.Address.Town.TownResponse;
 
 public interface TownService {
 

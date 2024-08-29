@@ -1,8 +1,7 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.DepartmentDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchyDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchyResponse;
+import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchy.DepartmentHierarchyDTO;
+import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchy.DepartmentHierarchyResponse;
 import com.deltasmarttech.companyorganization.services.DepartmentHierarchyService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;

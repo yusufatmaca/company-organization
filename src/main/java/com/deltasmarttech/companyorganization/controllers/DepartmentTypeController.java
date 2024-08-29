@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.DepartmentTypeDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentTypeResponse;
+import com.deltasmarttech.companyorganization.payloads.DepartmentType.DepartmentTypeDTO;
+import com.deltasmarttech.companyorganization.payloads.DepartmentType.DepartmentTypeResponse;
 import com.deltasmarttech.companyorganization.services.DepartmentTypeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

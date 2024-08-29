@@ -14,6 +14,6 @@ spring:
     database: MySQL
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/companyorganization
+    url: jdbc:mysql://localhost:3306/deltasmart
     username: root
     password: SpringBoot.123

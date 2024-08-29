@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.CompanyDTO;
-import com.deltasmarttech.companyorganization.payloads.CompanyResponse;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyDTO;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyResponse;
 import com.deltasmarttech.companyorganization.services.CompanyService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class CompanyController {
 	}
 
 	@DeleteMapping("/admin/companies/{companyId}")
-	public ResponseEntity<CompanyDTO> deleteCompanyType(@PathVariable Integer companyId) {
+	public ResponseEntity<CompanyDTO> deleteCompany(@PathVariable Integer companyId) {
 
 		CompanyDTO deletedCompanyDTO = companyService.deleteCompany(companyId);
 		return new ResponseEntity<>(deletedCompanyDTO, HttpStatus.OK);

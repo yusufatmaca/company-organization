@@ -3,7 +3,7 @@ package com.deltasmarttech.companyorganization.services;
 import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
 import com.deltasmarttech.companyorganization.models.*;
-import com.deltasmarttech.companyorganization.payloads.*;
+import com.deltasmarttech.companyorganization.payloads.Authentication.*;
 import com.deltasmarttech.companyorganization.repositories.*;
 import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
@@ -70,6 +70,10 @@ public class AuthenticationService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Company", "id", request.getCompanyId()));
 
+        if (!company.isActive()) {
+            throw new APIException("This company is inactive!");
+        }
+
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
 
@@ -130,6 +134,10 @@ public class AuthenticationService {
 
     public void checkForManagerInEmployees(Department department) {
         List<User> employees = department.getEmployees();
+
+        if(!department.isActive()) {
+            throw new APIException("The department is inactive. You cannot perform this action.");
+        }
 
         for (User employee : employees) {
             if (employee.getRole().getRoleName().name().equals("MANAGER")) {

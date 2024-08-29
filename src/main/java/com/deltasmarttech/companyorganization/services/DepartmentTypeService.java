@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.payloads.DepartmentTypeDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentTypeResponse;
+import com.deltasmarttech.companyorganization.payloads.DepartmentType.DepartmentTypeDTO;
+import com.deltasmarttech.companyorganization.payloads.DepartmentType.DepartmentTypeResponse;
 
 public interface DepartmentTypeService {
 

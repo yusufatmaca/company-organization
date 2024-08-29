@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.RegionDTO;
-import com.deltasmarttech.companyorganization.payloads.RegionResponse;
+import com.deltasmarttech.companyorganization.payloads.Address.Region.RegionDTO;
+import com.deltasmarttech.companyorganization.payloads.Address.Region.RegionResponse;
 import com.deltasmarttech.companyorganization.services.RegionService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import jakarta.validation.Valid;

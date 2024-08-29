@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.TownDTO;
-import com.deltasmarttech.companyorganization.payloads.TownResponse;
+import com.deltasmarttech.companyorganization.payloads.Address.Town.TownDTO;
+import com.deltasmarttech.companyorganization.payloads.Address.Town.TownResponse;
 import com.deltasmarttech.companyorganization.services.TownService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import jakarta.validation.Valid;

@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.payloads.RegionDTO;
-import com.deltasmarttech.companyorganization.payloads.RegionResponse;
+import com.deltasmarttech.companyorganization.payloads.Address.Region.RegionDTO;
+import com.deltasmarttech.companyorganization.payloads.Address.Region.RegionResponse;
 
 public interface RegionService {
 

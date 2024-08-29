@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.payloads.CompanyDTO;
-import com.deltasmarttech.companyorganization.payloads.CompanyResponse;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyDTO;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyResponse;
 
 public interface CompanyService {
 

@@ -1,5 +1,6 @@
 package com.deltasmarttech.companyorganization.payloads;
 
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ManagerDTO {
 
-	private Integer id;
+	@Email
 	private String email;
-
 }

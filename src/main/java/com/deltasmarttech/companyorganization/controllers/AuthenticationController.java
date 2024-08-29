@@ -1,8 +1,8 @@
 package com.deltasmarttech.companyorganization.controllers;
 
-import com.deltasmarttech.companyorganization.payloads.*;
-import com.deltasmarttech.companyorganization.models.AuthenticateRequest;
-import com.deltasmarttech.companyorganization.models.AuthenticationResponse;
+import com.deltasmarttech.companyorganization.payloads.Authentication.AuthenticateRequest;
+import com.deltasmarttech.companyorganization.payloads.Authentication.AuthenticationResponse;
+import com.deltasmarttech.companyorganization.payloads.Authentication.*;
 import com.deltasmarttech.companyorganization.services.AuthenticationService;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import jakarta.mail.MessagingException;

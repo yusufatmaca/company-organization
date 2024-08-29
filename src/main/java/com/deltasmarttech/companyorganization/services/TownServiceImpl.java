@@ -5,8 +5,8 @@ import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundExcepti
 import com.deltasmarttech.companyorganization.models.City;
 import com.deltasmarttech.companyorganization.models.Region;
 import com.deltasmarttech.companyorganization.models.Town;
-import com.deltasmarttech.companyorganization.payloads.TownDTO;
-import com.deltasmarttech.companyorganization.payloads.TownResponse;
+import com.deltasmarttech.companyorganization.payloads.Address.Town.TownDTO;
+import com.deltasmarttech.companyorganization.payloads.Address.Town.TownResponse;
 import com.deltasmarttech.companyorganization.repositories.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;

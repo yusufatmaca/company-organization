@@ -1,8 +1,8 @@
 -- MySQL dump 10.13  Distrib 8.0.39, for Linux (x86_64)
 --
--- Host: localhost    Database: companyorganization
+-- Host: localhost    Database: deltasmart
 -- ------------------------------------------------------
--- Server version	8.0.39-0ubuntu0.24.04.1
+-- Server version	8.0.39-0ubuntu0.24.04.2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +36,7 @@ CREATE TABLE `city` (
 
 LOCK TABLES `city` WRITE;
 /*!40000 ALTER TABLE `city` DISABLE KEYS */;
-INSERT INTO `city` VALUES (1,'2024-08-22 23:03:03.409864','İzmir');
+INSERT INTO `city` VALUES (1,'2024-08-29 10:10:51.606355','İzmir');
 /*!40000 ALTER TABLE `city` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -48,15 +48,15 @@ DROP TABLE IF EXISTS `company`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `company` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `active` bit(1) NOT NULL,
-  `address_detail` varchar(255) DEFAULT NULL,
+  `company_type_id` int DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `town_id` int DEFAULT NULL,
   `created_at` datetime(6) NOT NULL,
   `deleted_at` datetime(6) DEFAULT NULL,
+  `address_detail` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `short_name` varchar(255) DEFAULT NULL,
-  `company_type_id` int DEFAULT NULL,
-  `town_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKtle8dllhekyx8lbfycue0eild` (`company_type_id`),
   KEY `FKde0fxr5uwr7nluy48yfu25uu7` (`town_id`),
@@ -71,7 +71,7 @@ CREATE TABLE `company` (
 
 LOCK TABLES `company` WRITE;
 /*!40000 ALTER TABLE `company` DISABLE KEYS */;
-INSERT INTO `company` VALUES (1,_binary '','Teknopark İzmir A8 Binası','2024-08-22 23:03:19.770522',NULL,'Delta Akıllı Teknolojiler A.Ş.','Delta',1,1);
+INSERT INTO `company` VALUES (_binary '',1,1,1,'2024-08-29 10:10:51.688944',NULL,'Teknopark İzmir A8 Binası','Delta Akıllı Teknolojiler A.Ş.','Delta');
 /*!40000 ALTER TABLE `company` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,8 +83,8 @@ DROP TABLE IF EXISTS `company_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `company_type` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `active` bit(1) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) NOT NULL,
   `deleted_at` datetime(6) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE `company_type` (
 
 LOCK TABLES `company_type` WRITE;
 /*!40000 ALTER TABLE `company_type` DISABLE KEYS */;
-INSERT INTO `company_type` VALUES (1,_binary '','2024-08-22 23:02:56.095247',NULL,'Yazılım Geliştirme');
+INSERT INTO `company_type` VALUES (_binary '',1,'2024-08-29 10:10:51.661812',NULL,'Yazılım Geliştirme');
 /*!40000 ALTER TABLE `company_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,16 +110,16 @@ DROP TABLE IF EXISTS `department`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `department` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `active` bit(1) NOT NULL,
-  `address_detail` varchar(255) DEFAULT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `deleted_at` datetime(6) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
   `company_id` int DEFAULT NULL,
   `department_type_id` int DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `manager_id` int DEFAULT NULL,
   `town_id` int DEFAULT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `deleted_at` datetime(6) DEFAULT NULL,
+  `address_detail` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_g9435hkqyjp3h3qsaslcmk4rw` (`manager_id`),
   KEY `FKh1m88q0f7sc0mk76kju4kcn6f` (`company_id`),
@@ -138,7 +138,7 @@ CREATE TABLE `department` (
 
 LOCK TABLES `department` WRITE;
 /*!40000 ALTER TABLE `department` DISABLE KEYS */;
-INSERT INTO `department` VALUES (1,_binary '','Teknopark İzmir A8 Binası','2024-08-22 23:04:00.058819',NULL,'Genel Müdürlük',1,1,NULL,1),(2,_binary '','Teknopark İzmir A8 Binası','2024-08-22 23:04:07.345883',NULL,'Yazılım Geliştirme',1,2,NULL,1);
+INSERT INTO `department` VALUES (_binary '',1,1,1,3,1,'2024-08-29 10:10:51.725523',NULL,'Teknopark İzmir A8 Binası','Genel Müdürlük'),(_binary '',1,2,2,2,1,'2024-08-29 10:10:51.734383',NULL,'Teknopark İzmir A8 Binası','Yazılım Geliştirme');
 /*!40000 ALTER TABLE `department` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -165,6 +165,7 @@ CREATE TABLE `department_hierarchy` (
 
 LOCK TABLES `department_hierarchy` WRITE;
 /*!40000 ALTER TABLE `department_hierarchy` DISABLE KEYS */;
+INSERT INTO `department_hierarchy` VALUES (2,1);
 /*!40000 ALTER TABLE `department_hierarchy` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -176,8 +177,8 @@ DROP TABLE IF EXISTS `department_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `department_type` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `active` bit(1) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) NOT NULL,
   `deleted_at` datetime(6) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -191,7 +192,7 @@ CREATE TABLE `department_type` (
 
 LOCK TABLES `department_type` WRITE;
 /*!40000 ALTER TABLE `department_type` DISABLE KEYS */;
-INSERT INTO `department_type` VALUES (1,_binary '','2024-08-22 23:03:47.021784',NULL,'Yönetsel'),(2,_binary '','2024-08-22 23:03:50.933394',NULL,'Operasyonel');
+INSERT INTO `department_type` VALUES (_binary '',1,'2024-08-29 10:10:51.702547',NULL,'Yönetsel'),(_binary '',2,'2024-08-29 10:10:51.713080',NULL,'Operasyonel');
 /*!40000 ALTER TABLE `department_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -204,14 +205,14 @@ DROP TABLE IF EXISTS `email_confirmation_token`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `email_confirmation_token` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
   `created_at` datetime(6) DEFAULT NULL,
   `expires_at` datetime(6) DEFAULT NULL,
   `verification_code` varchar(255) DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_s88xsr4dc97qxxs46aafsxnt6` (`user_id`),
   CONSTRAINT `FK1nn2s9fe9dn1ive1wd0y99utv` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -231,10 +232,10 @@ DROP TABLE IF EXISTS `region`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `region` (
+  `city_id` int NOT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `created_at` datetime(6) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
-  `city_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FKedafr6k537xtdes7gc7nq778a` (`city_id`),
   CONSTRAINT `FKedafr6k537xtdes7gc7nq778a` FOREIGN KEY (`city_id`) REFERENCES `city` (`id`)
@@ -247,7 +248,7 @@ CREATE TABLE `region` (
 
 LOCK TABLES `region` WRITE;
 /*!40000 ALTER TABLE `region` DISABLE KEYS */;
-INSERT INTO `region` VALUES (1,'2024-08-22 23:03:08.256099','İzmir Güney',1);
+INSERT INTO `region` VALUES (1,1,'2024-08-29 10:10:51.639765','İzmir Güney');
 /*!40000 ALTER TABLE `region` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,7 +273,7 @@ CREATE TABLE `roles` (
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'2024-08-22 22:59:55.906784','ADMIN'),(2,'2024-08-22 22:59:55.954655','MANAGER'),(3,'2024-08-22 22:59:55.968109','EMPLOYEE');
+INSERT INTO `roles` VALUES (1,'2024-08-29 10:10:51.812716','ADMIN'),(2,'2024-08-29 10:10:51.823193','MANAGER'),(3,'2024-08-29 10:10:51.831774','EMPLOYEE');
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -285,9 +286,9 @@ DROP TABLE IF EXISTS `town`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `town` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `region_id` int NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
-  `region_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FKqsj4ud2o2yp0i2fkajq1rbsax` (`region_id`),
   CONSTRAINT `FKqsj4ud2o2yp0i2fkajq1rbsax` FOREIGN KEY (`region_id`) REFERENCES `region` (`id`)
@@ -300,7 +301,7 @@ CREATE TABLE `town` (
 
 LOCK TABLES `town` WRITE;
 /*!40000 ALTER TABLE `town` DISABLE KEYS */;
-INSERT INTO `town` VALUES (1,'2024-08-22 23:03:12.879393','Urla',1);
+INSERT INTO `town` VALUES (1,1,'2024-08-29 10:10:51.651167','Urla');
 /*!40000 ALTER TABLE `town` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -312,24 +313,24 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `active` bit(1) NOT NULL,
+  `department_id` int DEFAULT NULL,
+  `enabled` bit(1) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `role_id` int NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `deleted_at` datetime(6) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
-  `enabled` bit(1) NOT NULL,
   `name` varchar(255) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
   `surname` varchar(255) NOT NULL,
-  `department_id` int DEFAULT NULL,
-  `role_id` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`),
   KEY `FKfi832e3qv89fq376fuh8920y4` (`department_id`),
   KEY `FKp56c1712k691lhsyewcssf40f` (`role_id`),
   CONSTRAINT `FKfi832e3qv89fq376fuh8920y4` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`),
   CONSTRAINT `FKp56c1712k691lhsyewcssf40f` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -338,7 +339,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,_binary '','2024-08-22 23:02:10.568206',NULL,'yusufatmaca@protonmail.com',_binary '','Yusuf','$2a$10$gypPYrrUrd8FW7xe1./05etEZyBery9myyVgi.K7Du/bJnvpYIItW','Atmaca',NULL,1);
+INSERT INTO `users` VALUES (_binary '',1,_binary '',1,1,'2024-08-29 10:10:51.942068',NULL,'admin@delta.smart','System','$2a$10$UR39yvC4cUJktxiUqBHsIOxBV.JpWcz66LLCqnlVbwEd6O01u3Pne','Administrator'),(_binary '',2,_binary '',2,2,'2024-08-29 10:11:38.223670',NULL,'33yusufatmaca@gmail.com','Yusuf','$2a$10$tfZpDHL6xANaz3.MpSQ9CeTZv7OBYlTSZs.a7y5kZ6oymBIXmlGOC','Atmaca'),(_binary '',1,_binary '',3,2,'2024-08-29 10:11:49.020658',NULL,'yusufatmaca@protonmail.com','Yusuf','$2a$10$prmbu2yMTws5rxVVT8jrQOVtZjqn3xdkaFFYDYgr6prbVDmlQGMg6','Atmaca'),(_binary '',2,_binary '',4,3,'2024-08-29 10:12:16.117850',NULL,'yusufatmaca@std.iyte.edu.tr','Yusuf','$2a$10$c8VYZj/up0A0R60vOruLTuOGIxpeRtOFeyPsNmjcf/bZNXosbcB7W','Atmaca');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -351,4 +352,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-08-22 23:04:29
+-- Dump completed on 2024-08-29 10:19:45

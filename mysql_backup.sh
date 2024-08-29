@@ -2,7 +2,7 @@
 
 # Set variables
 DB_USER="root"
-DB_NAME="companyorganization"
+DB_NAME="deltasmart"
 BACKUP_FILE="deltasmart_backup.sql"
 MYSQL_CONTAINER_NAME="mysql_container_name" # Change this if you're using Docker
 

@@ -1,19 +1,22 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.models.Company;
-import com.deltasmarttech.companyorganization.models.Department;
-import com.deltasmarttech.companyorganization.models.User;
-import com.deltasmarttech.companyorganization.payloads.*;
+import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeRequest;
+import com.deltasmarttech.companyorganization.payloads.Department.DepartmentDTO;
+import com.deltasmarttech.companyorganization.payloads.Department.DepartmentResponse;
+import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeResponse;
+import com.deltasmarttech.companyorganization.payloads.Department.Employee.EmployeeResponse;
+import com.deltasmarttech.companyorganization.payloads.ManagerDTO;
 
 public interface DepartmentService {
 
 	DepartmentDTO createDepartment(DepartmentDTO departmentDTO, Integer companyId, Integer departmentTypeId, Integer townId);
 	DepartmentResponse getAllDepartmentsByCompany(Integer companyId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 	DepartmentDTO deleteDepartment(Integer companyId, Integer departmentId);
-	DepartmentDTO assignManager(ManagerDTO user, Integer companyId, Integer departmentId);
-
 	EmployeeResponse showAllEmployees(Integer companyId, Integer departmentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
-	Department addEmployee(User employee, Department department, Company company);
-	Department deleteEmployee(User employee, Department department, Company company);
-	DepartmentDTO processEmployee(AddOrRemoveEmployeeRequest employee, Integer companyId, Integer departmentId, Integer operationType);
+	DepartmentDTO assignManager(ManagerDTO manager, Integer companyId, Integer departmentId);
+	DepartmentDTO deleteManager(Integer companyId, Integer departmentId);
+
+	DepartmentDTO addEmployee(AddOrRemoveEmployeeRequest employee, Integer companyId, Integer departmentId);
+
+	AddOrRemoveEmployeeResponse deleteEmployee(Integer employeeId, Integer companyId, Integer departmentId);
 }

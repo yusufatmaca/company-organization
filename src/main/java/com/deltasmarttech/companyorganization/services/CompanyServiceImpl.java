@@ -5,7 +5,13 @@ import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundExcepti
 import com.deltasmarttech.companyorganization.models.Company;
 import com.deltasmarttech.companyorganization.models.CompanyType;
 import com.deltasmarttech.companyorganization.models.Town;
-import com.deltasmarttech.companyorganization.payloads.*;
+import com.deltasmarttech.companyorganization.payloads.Address.AddressDTO;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyDTO;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyResponse;
+import com.deltasmarttech.companyorganization.payloads.CompanyType.CompanyTypeDTO;
+import com.deltasmarttech.companyorganization.payloads.Department.DepartmentDTO;
+import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeResponse;
+import com.deltasmarttech.companyorganization.payloads.DepartmentType.DepartmentTypeDTO;
 import com.deltasmarttech.companyorganization.repositories.CompanyRepository;
 import com.deltasmarttech.companyorganization.repositories.CompanyTypeRepository;
 import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
@@ -20,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -38,6 +45,9 @@ public class CompanyServiceImpl implements CompanyService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+
+	@Autowired
+	private DepartmentServiceImpl departmentServiceImpl;
 
 	@Override
 	public CompanyDTO createCompany(CompanyDTO companyDTO, Integer companyTypeId, Integer townId) {
@@ -106,9 +116,11 @@ public class CompanyServiceImpl implements CompanyService {
 
 		CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
 		companyDTO.setActive(company.isActive());
-		companyDTO.getDepartments().stream()
-				.forEach(department -> {
-				});
+		List<DepartmentDTO> departmentDTOs = company.getDepartments()
+				.stream()
+				.map(departmentServiceImpl::converttoDepartmentDTO)
+				.collect(Collectors.toList());
+		companyDTO.setDepartments(departmentDTOs);
 
 		return companyDTO;
 	}
@@ -133,7 +145,7 @@ public class CompanyServiceImpl implements CompanyService {
 				});
 		Company updatedCompany = companyRepository.save(company);
 
-		CompanyDTO companyDTO = modelMapper.map(updatedCompany, CompanyDTO.class);
+		CompanyDTO companyDTO = convertToCompanyDTO(updatedCompany);
 		return companyDTO;
 	}
 }

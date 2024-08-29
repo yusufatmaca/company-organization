@@ -5,8 +5,8 @@ import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundExcepti
 import com.deltasmarttech.companyorganization.models.City;
 import com.deltasmarttech.companyorganization.models.Region;
 import com.deltasmarttech.companyorganization.models.Town;
-import com.deltasmarttech.companyorganization.payloads.CityDTO;
-import com.deltasmarttech.companyorganization.payloads.CityResponse;
+import com.deltasmarttech.companyorganization.payloads.Address.City.CityDTO;
+import com.deltasmarttech.companyorganization.payloads.Address.City.CityResponse;
 import com.deltasmarttech.companyorganization.repositories.CityRepository;
 import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
 import org.modelmapper.ModelMapper;

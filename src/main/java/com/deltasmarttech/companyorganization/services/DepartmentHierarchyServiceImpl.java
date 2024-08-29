@@ -1,12 +1,11 @@
 package com.deltasmarttech.companyorganization.services;
 
 import com.deltasmarttech.companyorganization.exceptions.APIException;
-import com.deltasmarttech.companyorganization.models.Company;
 import com.deltasmarttech.companyorganization.models.Department;
 import com.deltasmarttech.companyorganization.models.DepartmentHierarchy;
 import com.deltasmarttech.companyorganization.models.DepartmentHierarchyId;
-import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchyDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchyResponse;
+import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchy.DepartmentHierarchyDTO;
+import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchy.DepartmentHierarchyResponse;
 import com.deltasmarttech.companyorganization.repositories.DepartmentHierarchyRepository;
 import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
 import org.modelmapper.ModelMapper;

@@ -1,7 +1,7 @@
 package com.deltasmarttech.companyorganization.services;
 
-import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchyDTO;
-import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchyResponse;
+import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchy.DepartmentHierarchyDTO;
+import com.deltasmarttech.companyorganization.payloads.DepartmentHierarchy.DepartmentHierarchyResponse;
 import org.springframework.stereotype.Repository;
 
 @Repository
