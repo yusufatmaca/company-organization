@@ -247,6 +247,7 @@ public class AuthenticationService {
 
         user.setActive(false);
         user.setDeletedAt(LocalDateTime.now());
+        user.setDepartment(null);
         userRepository.save(user);
 
         return AuthenticationResponse.builder()

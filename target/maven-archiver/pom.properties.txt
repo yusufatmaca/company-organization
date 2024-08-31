@@ -1,3 +1,0 @@
-artifactId=companyorganization
-groupId=com.deltasmarttech
-version=0.0.1-SNAPSHOT

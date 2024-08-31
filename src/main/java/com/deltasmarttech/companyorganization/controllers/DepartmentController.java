@@ -35,7 +35,7 @@ public class DepartmentController {
 		return new ResponseEntity<>(savedDepartmentDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/public/companies/{companyId}/departments")
+	@GetMapping("/admin/companies/{companyId}/departments")
 	public ResponseEntity<DepartmentResponse> getAllDepartmentsByCompany(
 			@PathVariable Integer companyId,
 			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
