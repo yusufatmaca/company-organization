@@ -17,6 +17,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Set;
 
@@ -26,17 +29,16 @@ import static org.springframework.http.HttpMethod.*;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig{
+
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-
-    @Autowired
     private final CustomAccessDeniedHandler accessDeniedHandler;
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply CORS configuration
                 .authorizeHttpRequests((authorize)->authorize
                         .requestMatchers(
                                 "/api/v1/auth/**",
@@ -78,6 +80,19 @@ public class SecurityConfig{
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true); // Allows cookies and authorization headers
+        configuration.addAllowedOrigin("http://localhost:3000"); // Your frontend origin
+        configuration.addAllowedHeader("*"); // Allows all headers
+        configuration.addAllowedMethod("*"); // Allows all HTTP methods
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Transactional
