@@ -14,6 +14,5 @@ public class CityDTO {
 
 	private Integer id;
 	private String name;
-	private List<RegionDTO> regions;
 
 }

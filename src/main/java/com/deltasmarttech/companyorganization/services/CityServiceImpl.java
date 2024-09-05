@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CityServiceImpl implements CityService {
@@ -35,8 +36,12 @@ public class CityServiceImpl implements CityService {
 	@Override
 	public CityDTO createCity(CityDTO cityDTO) {
 		City city = modelMapper.map(cityDTO, City.class);
-		City savedCity = cityRepository.findByName(cityDTO.getName())
-				.orElseThrow(() -> new APIException("City with the name: " + cityDTO.getName() + " already exists!"));
+		Optional<City> savedCity = cityRepository.findByName(cityDTO.getName());
+
+		if (savedCity.isPresent()) {
+			throw new APIException("City with the name: " + cityDTO.getName() + " already exists!");
+		}
+
 		city.setCreatedAt(LocalDateTime.now());
 		City c = cityRepository.save(city);
 		return modelMapper.map(c, CityDTO.class);
@@ -60,19 +65,6 @@ public class CityServiceImpl implements CityService {
 				.map(city -> modelMapper.map(city, CityDTO.class))
 				.toList();
 
-		/*
-		List<CityDTO> cityDTOS = cities.stream()
-				.map(city -> {
-					CityDTO cityDTO = modelMapper.map(city, CityDTO.class);
-					// Sort regions alphabetically
-					cityDTO.setRegions(cityDTO.getRegions().stream()
-							.sorted(Comparator.comparing(RegionDTO::getName))
-							.collect(Collectors.toList()));
-					return cityDTO;
-				})
-				.collect(Collectors.toList());
-
-		*/
 		CityResponse cityResponse = new CityResponse();
 		cityResponse.setContent(cityDTOS);
 		cityResponse.setPageNumber(cityPage.getNumber());

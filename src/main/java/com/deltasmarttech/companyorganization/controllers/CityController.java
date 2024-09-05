@@ -42,5 +42,4 @@ public class CityController {
 		CityDTO deletedCityDTO = cityService.deleteCity(cityId);
 		return new ResponseEntity<>(deletedCityDTO, HttpStatus.OK);
 	}
-
 }
