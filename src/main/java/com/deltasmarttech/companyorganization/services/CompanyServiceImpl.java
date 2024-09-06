@@ -120,7 +120,6 @@ public class CompanyServiceImpl implements CompanyService {
 				.stream()
 				.map(departmentServiceImpl::converttoDepartmentDTO)
 				.collect(Collectors.toList());
-		companyDTO.setDepartments(departmentDTOs);
 
 		return companyDTO;
 	}

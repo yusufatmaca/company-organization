@@ -17,7 +17,7 @@ public class CompanyDTO {
 	private String name;
 	private String shortName;
 	private CompanyTypeDTO companyType;
-	private List<DepartmentDTO> departments;
+	// private List<DepartmentDTO> departments;
 	private String addressDetail;
 	private boolean active = true;
 

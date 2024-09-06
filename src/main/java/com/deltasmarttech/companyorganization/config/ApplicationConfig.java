@@ -2,7 +2,6 @@ package com.deltasmarttech.companyorganization.config;
 
 import com.deltasmarttech.companyorganization.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,7 +20,6 @@ import org.modelmapper.ModelMapper;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    @Autowired
     private final UserRepository userRepository;
 
     @Bean

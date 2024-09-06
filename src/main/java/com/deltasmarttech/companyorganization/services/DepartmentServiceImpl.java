@@ -415,7 +415,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 				})
 				.toList();
 
-		departmentDTO.setEmployees(employees);
 		departmentDTO.setActive(department.isActive());
 
 		return departmentDTO;

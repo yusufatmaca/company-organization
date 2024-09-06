@@ -20,5 +20,4 @@ public class DepartmentDTO {
 	private String addressDetail;
 	private DepartmentTypeDTO departmentType;
 	private boolean active;
-	private List<AddOrRemoveEmployeeResponse> employees;
 }
