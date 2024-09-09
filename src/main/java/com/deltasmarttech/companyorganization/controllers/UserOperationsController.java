@@ -20,7 +20,6 @@ public class UserOperationsController {
         this.userOperationService = userOperationService;
     }
 
-
     @GetMapping("/admin/show-all-users")
     public ResponseEntity<AllUsersResponse> showAllUsers(
             @RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,

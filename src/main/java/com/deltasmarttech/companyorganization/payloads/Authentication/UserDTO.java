@@ -16,7 +16,9 @@ public class UserDTO {
     private String surname;
     private String email;
     private String roleName;
+    private Integer companyId;
     private String companyName;
+    private Integer departmentId;
     private String departmentName;
     private boolean active;
     private boolean enabled;

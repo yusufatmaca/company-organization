@@ -104,8 +104,10 @@ public class UserOperationServiceImpl implements UserOperationService {
                 .name(user.getName())
                 .surname(user.getSurname())
                 .email(user.getEmail())
-                .roleName(user.getRole().getRoleName().name()) // Assuming Role is an enum
+                .roleName(user.getRole().getRoleName().name())
+                .companyId(user.getDepartment().getCompany().getId())
                 .companyName(user.getDepartment() != null ? user.getDepartment().getCompany().getName() : null)
+                .departmentId(user.getDepartment().getId())
                 .departmentName(user.getDepartment() != null ? user.getDepartment().getName() : null)
                 .active(user.isActive())
                 .enabled(user.isEnabled())
