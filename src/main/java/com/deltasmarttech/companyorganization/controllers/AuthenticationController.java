@@ -85,5 +85,4 @@ public class AuthenticationController {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("You've been logged out!");
     }
-
 }

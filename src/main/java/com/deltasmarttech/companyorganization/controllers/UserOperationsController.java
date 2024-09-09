@@ -2,7 +2,6 @@ package com.deltasmarttech.companyorganization.controllers;
 
 import com.deltasmarttech.companyorganization.payloads.Authentication.AllUsersResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.UserDTO;
-import com.deltasmarttech.companyorganization.services.AuthenticationService;
 import com.deltasmarttech.companyorganization.services.UserOperationService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import org.springframework.http.HttpStatus;

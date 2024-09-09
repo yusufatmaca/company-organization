@@ -114,16 +114,45 @@ public class CompanyServiceImpl implements CompanyService {
 
 
 	private CompanyDTO convertToCompanyDTO(Company company) {
+		if (company == null) {
+			return null; // Handle null case if required
+		}
 
-		CompanyDTO companyDTO = modelMapper.map(company, CompanyDTO.class);
-		companyDTO.setActive(company.isActive());
-		List<DepartmentDTO> departmentDTOs = company.getDepartments()
-				.stream()
-				.map(departmentServiceImpl::converttoDepartmentDTO)
-				.collect(Collectors.toList());
+		// Convert CompanyType entity to CompanyTypeDTO
+		CompanyTypeDTO companyTypeDTO = CompanyTypeDTO.builder()
+				.id(company.getCompanyType().getId())
+				.name(company.getCompanyType().getName())
+				.active(company.getCompanyType().isActive())
+				.build();
 
-		return companyDTO;
+		// Extract city, region, and town names from the Town entity
+		String cityName = null;
+		String regionName = null;
+		String townName = null;
+		if (company.getTown() != null) {
+			townName = company.getTown().getName();
+			if (company.getTown().getRegion() != null) {
+				regionName = company.getTown().getRegion().getName();
+				if (company.getTown().getRegion().getCity() != null) {
+					cityName = company.getTown().getRegion().getCity().getName();
+				}
+			}
+		}
+
+		// Build the CompanyDTO object
+		return CompanyDTO.builder()
+				.id(company.getId())
+				.name(company.getName())
+				.shortName(company.getShortName())
+				.city(cityName)
+				.region(regionName)
+				.town(townName)
+				.companyType(companyTypeDTO)
+				.addressDetail(company.getAddressDetail())
+				.active(company.isActive())
+				.build();
 	}
+
 
 	@Override
 	public CompanyDTO deleteCompany(Integer companyId) {
