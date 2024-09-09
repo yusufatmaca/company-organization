@@ -27,7 +27,7 @@ public class CompanyController {
 		return new ResponseEntity<>(savedCompanyDTO, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/public/companies")
+	@GetMapping("/admin/companies")
 	public ResponseEntity<CompanyResponse> getAllCompanies(
 			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
@@ -43,6 +43,15 @@ public class CompanyController {
 
 		CompanyDTO deletedCompanyDTO = companyService.deleteCompany(companyId);
 		return new ResponseEntity<>(deletedCompanyDTO, HttpStatus.OK);
+	}
+
+	@PutMapping("/admin/companies/{companyId}")
+	public ResponseEntity<CompanyDTO> updateCompany(
+			@PathVariable Integer companyId,
+			@RequestBody CompanyDTO companyDTO) {
+
+		CompanyDTO updatedCompanyDTO = companyService.updateCompany(companyId, companyDTO);
+		return new ResponseEntity<>(updatedCompanyDTO, HttpStatus.OK);
 	}
 
 }

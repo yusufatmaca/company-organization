@@ -60,6 +60,4 @@ public class Department {
 	@OneToOne
 	@JoinColumn(name = "manager_id")
 	private User manager;
-
-
 }

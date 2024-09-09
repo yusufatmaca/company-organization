@@ -4,7 +4,6 @@ import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
 import com.deltasmarttech.companyorganization.models.*;
 import com.deltasmarttech.companyorganization.payloads.*;
-import com.deltasmarttech.companyorganization.payloads.Address.AddressDTO;
 import com.deltasmarttech.companyorganization.payloads.Department.*;
 import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeRequest;
 import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeResponse;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -345,6 +345,73 @@ public class DepartmentServiceImpl implements DepartmentService {
 				employeeUser.getRole().getRoleName().name());
 	}
 
+	@Override
+	public DepartmentDTO updateDepartment(Integer companyId, Integer departmentId, DepartmentDTO departmentDTO) {
+
+		Company existingCompany = companyRepository.findById(companyId)
+				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
+		if (!existingCompany.isActive()) {
+			throw new APIException("You cannot edit " + existingCompany.getName() + " because it's not active!");
+		}
+
+		Department existingDepartment = departmentRepository.findById(departmentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Department", "id", departmentId));
+		if (!existingDepartment.isActive()) {
+			throw new APIException("You cannot edit " + existingDepartment.getName() + " because it's not active!");
+		}
+
+		if (existingDepartment.getCompany().getId() != existingCompany.getId()) {
+			throw new APIException("This department does not belong to this specific company!");
+		}
+
+		if (departmentDTO.getName() != null) {
+			existingDepartment.setName(departmentDTO.getName());
+		}
+		if (departmentDTO.getTown() != null && !departmentDTO.getTown().isBlank()) {
+			Town town = townRepository.findByName(departmentDTO.getTown())
+					.orElseThrow(() -> new ResourceNotFoundException("Town", "name", departmentDTO.getTown()));
+
+			existingDepartment.setTown(town);
+		}
+		if (departmentDTO.getDepartmentType() != null) {
+			DepartmentType departmentType = departmentTypeRepository.findByName(departmentDTO.getDepartmentType().getName())
+					.orElseThrow(() -> new ResourceNotFoundException("DepartmentType", "name", departmentDTO.getDepartmentType().getName()));
+			existingDepartment.setDepartmentType(departmentType);
+		}
+		if (departmentDTO.getAddressDetail() != null) {
+			existingDepartment.setAddressDetail(departmentDTO.getAddressDetail());
+		}
+
+		Department updatedDepartment = departmentRepository.save(existingDepartment);
+
+		return converttoDepartmentDTO(updatedDepartment);
+	}
+
+	@Override
+	public DepartmentResponse getAllDepartments(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+		Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+				? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+
+		Pageable pageable = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+		Page<Department> departmentsPage = departmentRepository.findAll(pageable);
+		List<Department> departmentList = departmentsPage.getContent();
+		List<DepartmentDTO> departmentDTOList = departmentList.stream()
+				.map(this::converttoDepartmentDTO)
+				.collect(Collectors.toList());
+
+		DepartmentResponse departmentResponse = new DepartmentResponse();
+		departmentResponse.setContent(departmentDTOList);
+		departmentResponse.setPageNumber(departmentsPage.getNumber());
+		departmentResponse.setPageSize(departmentsPage.getSize());
+		departmentResponse.setTotalElements(departmentsPage.getTotalElements());
+		departmentResponse.setTotalPages(departmentsPage.getTotalPages());
+		departmentResponse.setLastPage(departmentsPage.isLast());
+
+		return departmentResponse;
+	}
+
 
 	@Override
 	public EmployeeResponse showAllEmployees(
@@ -390,15 +457,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 	public DepartmentDTO converttoDepartmentDTO(Department department) {
 
 		DepartmentDTO departmentDTO = new DepartmentDTO();
+
 		departmentDTO.setId(department.getId());
 		departmentDTO.setName(department.getName());
 
-		AddressDTO address = new AddressDTO();
-		address.setCityName(department.getTown().getRegion().getCity().getName());
-		address.setRegionName(department.getTown().getRegion().getName());
-		address.setTownName(department.getTown().getName());
-		address.setId(department.getTown().getId());
-		departmentDTO.setAddress(address);
+		departmentDTO.setCity(department.getTown().getRegion().getCity().getName());
+		departmentDTO.setRegion(department.getTown().getRegion().getName());
+		departmentDTO.setTown(department.getTown().getName());
 
 		departmentDTO.setAddressDetail(department.getAddressDetail());
 		departmentDTO.setDepartmentType(modelMapper.map(department.getDepartmentType(), DepartmentTypeDTO.class));

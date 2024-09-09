@@ -15,8 +15,9 @@ public interface DepartmentService {
 	EmployeeResponse showAllEmployees(Integer companyId, Integer departmentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 	DepartmentDTO assignManager(ManagerDTO manager, Integer companyId, Integer departmentId);
 	DepartmentDTO deleteManager(Integer companyId, Integer departmentId);
-
 	DepartmentDTO addEmployee(AddOrRemoveEmployeeRequest employee, Integer companyId, Integer departmentId);
-
 	AddOrRemoveEmployeeResponse deleteEmployee(Integer employeeId, Integer companyId, Integer departmentId);
+    DepartmentDTO updateDepartment(Integer companyId, Integer departmentId, DepartmentDTO departmentDTO);
+
+	DepartmentResponse getAllDepartments(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 }

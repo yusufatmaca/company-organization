@@ -2,9 +2,7 @@ package com.deltasmarttech.companyorganization.services;
 
 import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
-import com.deltasmarttech.companyorganization.models.Company;
-import com.deltasmarttech.companyorganization.models.CompanyType;
-import com.deltasmarttech.companyorganization.models.Town;
+import com.deltasmarttech.companyorganization.models.*;
 import com.deltasmarttech.companyorganization.payloads.Address.AddressDTO;
 import com.deltasmarttech.companyorganization.payloads.Company.CompanyDTO;
 import com.deltasmarttech.companyorganization.payloads.Company.CompanyResponse;
@@ -12,10 +10,7 @@ import com.deltasmarttech.companyorganization.payloads.CompanyType.CompanyTypeDT
 import com.deltasmarttech.companyorganization.payloads.Department.DepartmentDTO;
 import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeResponse;
 import com.deltasmarttech.companyorganization.payloads.DepartmentType.DepartmentTypeDTO;
-import com.deltasmarttech.companyorganization.repositories.CompanyRepository;
-import com.deltasmarttech.companyorganization.repositories.CompanyTypeRepository;
-import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
-import com.deltasmarttech.companyorganization.repositories.TownRepository;
+import com.deltasmarttech.companyorganization.repositories.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,6 +43,12 @@ public class CompanyServiceImpl implements CompanyService {
 
 	@Autowired
 	private DepartmentServiceImpl departmentServiceImpl;
+
+	@Autowired
+	private CityRepository cityRepository;
+
+	@Autowired
+	private RegionRepository regionRepository;
 
 	@Override
 	public CompanyDTO createCompany(CompanyDTO companyDTO, Integer companyTypeId, Integer townId) {
@@ -146,5 +147,65 @@ public class CompanyServiceImpl implements CompanyService {
 
 		CompanyDTO companyDTO = convertToCompanyDTO(updatedCompany);
 		return companyDTO;
+	}
+
+	@Override
+	public CompanyDTO updateCompany(Integer companyId, CompanyDTO companyDTO) {
+
+		Company company = companyRepository.findById(companyId)
+				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
+
+		if (!company.isActive()) {
+			throw new APIException(" You cannot edit " + company.getName() + " because it's not active!");
+		}
+
+		if (companyDTO.getName() != null && !companyDTO.getName().isBlank()) {
+			company.setName(companyDTO.getName());
+		}
+		if (companyDTO.getShortName() != null && !companyDTO.getShortName().isBlank()) {
+			company.setShortName(companyDTO.getShortName());
+		}
+		if (companyDTO.getCompanyType() != null && companyDTO.getCompanyType().isActive()) {
+			CompanyType companyType = companyTypeRepository.findById(companyDTO.getCompanyType().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("CompanyType", "id", companyDTO.getCompanyType().getId()));
+			company.setCompanyType(companyType);
+		}
+		if (companyDTO.getAddressDetail() != null && !companyDTO.getAddressDetail().isBlank()) {
+			company.setAddressDetail(companyDTO.getAddressDetail());
+		}
+		if (companyDTO.getTown() != null && !companyDTO.getTown().isBlank()) {
+			Town town = townRepository.findByName(companyDTO.getTown())
+							.orElseThrow(() -> new ResourceNotFoundException("Town", "name", companyDTO.getTown()));
+			company.setTown(town);
+		}
+
+		Company updatedCompany = companyRepository.save(company);
+		return mapToCompanyDTO(updatedCompany);
+
+	}
+
+	private CompanyDTO mapToCompanyDTO(Company company) {
+		return CompanyDTO.builder()
+				.id(company.getId())
+				.name(company.getName())
+				.shortName(company.getShortName())
+				.companyType(mapToCompanyTypeDTO(company.getCompanyType()))
+				.addressDetail(company.getAddressDetail())
+				.active(company.isActive())
+				.town(company.getTown().getName())
+				.region(company.getTown().getRegion().getName())
+				.city(company.getTown().getRegion().getCity().getName())
+				.build();
+	}
+
+	private CompanyTypeDTO mapToCompanyTypeDTO(CompanyType companyType) {
+		if (companyType == null) {
+			return null;
+		}
+		return CompanyTypeDTO.builder()
+				.id(companyType.getId())
+				.name(companyType.getName())
+				.active(companyType.isActive())
+				.build();
 	}
 }

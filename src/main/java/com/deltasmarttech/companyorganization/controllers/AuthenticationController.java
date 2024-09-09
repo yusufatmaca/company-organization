@@ -1,13 +1,16 @@
 package com.deltasmarttech.companyorganization.controllers;
 
+import com.deltasmarttech.companyorganization.payloads.Address.City.CityResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.AuthenticateRequest;
 import com.deltasmarttech.companyorganization.payloads.Authentication.AuthenticationResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.*;
 import com.deltasmarttech.companyorganization.services.AuthenticationService;
+import com.deltasmarttech.companyorganization.util.AppConstants;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,8 +80,10 @@ public class AuthenticationController {
     public ResponseEntity<String> logout() {
 
         ResponseCookie cookie = jwtUtil.getCleanJwtCookie();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("You've been logged out!");
     }
+
 }

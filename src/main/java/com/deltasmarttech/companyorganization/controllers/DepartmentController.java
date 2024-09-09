@@ -2,6 +2,7 @@ package com.deltasmarttech.companyorganization.controllers;
 
 import com.deltasmarttech.companyorganization.models.User;
 import com.deltasmarttech.companyorganization.payloads.*;
+import com.deltasmarttech.companyorganization.payloads.Company.CompanyDTO;
 import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeRequest;
 import com.deltasmarttech.companyorganization.payloads.Department.DepartmentDTO;
 import com.deltasmarttech.companyorganization.payloads.Department.DepartmentResponse;
@@ -23,6 +24,17 @@ public class DepartmentController {
 
 	@Autowired
 	private DepartmentService departmentService;
+
+	@GetMapping("/admin/departments")
+	public ResponseEntity<DepartmentResponse> getAllDepartments(
+			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+			@RequestParam(name="sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+			@RequestParam(name="sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
+
+		DepartmentResponse allDepartmentsByCompanyResponse = departmentService.getAllDepartments(pageNumber, pageSize, sortBy, sortOrder);
+		return new ResponseEntity<>(allDepartmentsByCompanyResponse, HttpStatus.OK);
+	}
 
 	@PostMapping("/admin/companies/{companyId}/departments")
 	public ResponseEntity<DepartmentDTO> createDepartment(
@@ -122,6 +134,16 @@ public class DepartmentController {
 				sortOrder);
 
 		return new ResponseEntity<>(employeeResponse, HttpStatus.OK);
+	}
+
+	@PutMapping("/admin/companies/{companyId}/departments/{departmentId}")
+	public ResponseEntity<DepartmentDTO> updateDepartment(
+			@PathVariable Integer companyId,
+			@PathVariable Integer departmentId,
+			@RequestBody DepartmentDTO departmentDTO) {
+
+		DepartmentDTO updatedDepartmentDTO = departmentService.updateDepartment(companyId, departmentId, departmentDTO);
+		return new ResponseEntity<>(updatedDepartmentDTO, HttpStatus.OK);
 	}
 
 

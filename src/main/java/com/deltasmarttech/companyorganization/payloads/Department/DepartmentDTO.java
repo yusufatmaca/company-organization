@@ -16,7 +16,9 @@ public class DepartmentDTO {
 
 	private Integer id;
 	private String name;
-	private AddressDTO address;
+	private String city;
+	private String region;
+	private String town;
 	private String addressDetail;
 	private DepartmentTypeDTO departmentType;
 	private boolean active;
