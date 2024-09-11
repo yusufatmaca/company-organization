@@ -15,11 +15,13 @@ import java.util.List;
 public class DepartmentDTO {
 
 	private Integer id;
+	private Integer companyId;
 	private String name;
 	private String city;
 	private String region;
 	private String town;
 	private String addressDetail;
+	private Integer managerId;
 	private DepartmentTypeDTO departmentType;
 	private boolean active;
 }

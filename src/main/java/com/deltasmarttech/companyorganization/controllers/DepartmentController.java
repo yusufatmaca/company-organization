@@ -89,16 +89,16 @@ public class DepartmentController {
 
 
 	@PostMapping("/manager/companies/{companyId}/departments/{departmentId}/employees")
-	public ResponseEntity<DepartmentDTO> addEmployee(
+	public ResponseEntity<AddOrRemoveEmployeeResponse> addEmployee(
 			@RequestBody AddOrRemoveEmployeeRequest employee,
 			@PathVariable Integer companyId,
 			@PathVariable Integer departmentId) {
-		DepartmentDTO employeeOperation = departmentService.addEmployee(
+		AddOrRemoveEmployeeResponse addOrRemoveEmployeeResponse = departmentService.addEmployee(
 				employee,
 				companyId,
 				departmentId);
 
-		return new ResponseEntity<>(employeeOperation, HttpStatus.OK);
+		return new ResponseEntity<>(addOrRemoveEmployeeResponse, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/manager/companies/{companyId}/departments/{departmentId}/employees/{employeeId}")

@@ -198,9 +198,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 		}
 
 		department.getEmployees().add(userManager);
-		userManager.setDepartment(department);
 
+		userManager.setDepartment(department);
+		userManager.setRole(roleRepository.findByRoleName(AppRole.valueOf("MANAGER")).orElseThrow(() -> new APIException("")));
 		userRepository.save(userManager);
+
 		return converttoDepartmentDTO(departmentRepository.save(department));
 	}
 
@@ -240,15 +242,15 @@ public class DepartmentServiceImpl implements DepartmentService {
 			}
 		}
 
-		department.getEmployees().remove(manager);
-		manager.setDepartment(null);
+		// department.getEmployees().remove(manager);
+		manager.setRole(roleRepository.findByRoleName(AppRole.valueOf("EMPLOYEE")).orElseThrow(() -> new APIException("")));
 
 		userRepository.save(manager);
 		return converttoDepartmentDTO(departmentRepository.save(department));
 	}
 
 	@Override
-	public DepartmentDTO addEmployee(AddOrRemoveEmployeeRequest employee,
+	public AddOrRemoveEmployeeResponse addEmployee(AddOrRemoveEmployeeRequest employee,
 									 Integer companyId,
 									 Integer departmentId) {
 
@@ -288,7 +290,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new APIException("You do not have to perform this action.");
 		}
 
-		return converttoDepartmentDTO(department);
+		return new AddOrRemoveEmployeeResponse(employeeUser.getEmail(),
+				employeeUser.getName(),
+				employeeUser.getSurname(),
+				employeeUser.getRole().getRoleName().name());
 
 	}
 
@@ -481,6 +486,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 				.toList();
 
 		departmentDTO.setActive(department.isActive());
+		departmentDTO.setCompanyId(department.getCompany().getId());
+		if (department.getManager() != null) {
+			departmentDTO.setManagerId(department.getManager().getId());
+		}
 
 		return departmentDTO;
 	}
