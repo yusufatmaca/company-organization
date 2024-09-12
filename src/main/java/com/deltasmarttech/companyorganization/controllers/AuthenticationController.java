@@ -71,7 +71,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @DeleteMapping("/auth/users/delete ")
+    @DeleteMapping("/auth/users/delete")
     public ResponseEntity<AuthenticationResponse> deleteUser(@RequestBody DeleteUserDTO delete) {
         return ResponseEntity.ok(authService.deleteUser(delete));
     }
