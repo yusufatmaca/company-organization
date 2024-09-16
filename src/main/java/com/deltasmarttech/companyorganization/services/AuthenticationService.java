@@ -128,6 +128,7 @@ public class AuthenticationService {
         companyRepository.save(company);
 
         return AddUserResponse.builder()
+                .id(user.getId())
                 .email(request.getEmail())
                 .role(appRole.name())
                 .message("User has been registered. " +
@@ -198,6 +199,8 @@ public class AuthenticationService {
                 .enabled(user.isEnabled())
                 .roleName(user.getRole().getRoleName().name())
                 .message("Login successful!")
+                .companyId(user.getDepartment().getCompany() != null ? user.getDepartment().getCompany().getId() : null)
+                .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
                 .build();
 
     }

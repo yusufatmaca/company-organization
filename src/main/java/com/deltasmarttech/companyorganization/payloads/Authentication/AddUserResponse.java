@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddUserResponse {
 
+    private Integer id;
     private String email;
     private String companyName;
     private String departmentName;

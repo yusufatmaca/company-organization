@@ -17,5 +17,7 @@ public class AuthenticationResponse {
     private String message;
     private boolean enabled;
     private boolean active;
+    private Integer companyId;
+    private Integer departmentId;
 
 }
