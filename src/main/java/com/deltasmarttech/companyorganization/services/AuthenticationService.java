@@ -265,7 +265,7 @@ public class AuthenticationService {
                 .roleName(user.getRole().getRoleName().name())
                 .enabled(user.isEnabled())
                 .active(user.isActive())
-                .message("Your account has deleted!")
+                .message("This account has been deleted!")
                 .build();
     }
 
