@@ -254,10 +254,20 @@ public class AuthenticationService {
             throw new APIException("You don't have permission to delete this account");
         }
 
+        Department dept;
+        if (user.getRole().getRoleName().name().equalsIgnoreCase("MANAGER")) {
+            dept = user.getDepartment();
+            dept.setManager(null);
+            departmentRepository.save(dept);
+        }
+
         user.setActive(false);
         user.setDeletedAt(LocalDateTime.now());
         user.setDepartment(null);
         userRepository.save(user);
+
+
+
 
         return AuthenticationResponse.builder()
                 .token(null)
