@@ -188,9 +188,17 @@ public class DepartmentServiceImpl implements DepartmentService {
 					"he/she is inactive or has not yet confirmed his/her account.");
 		}
 
+		if (manager.getRole().getRoleName().name().equalsIgnoreCase("EMPLOYEE")) {
+			Department currentDepartment = manager.getDepartment();
+			if (currentDepartment != null) {
+				manager.setDepartment(null);
+			}
+		}
+
 		// Set the manager for the department
 		department.setManager(manager);
 		manager.getManagedDepartments().add(department);
+		manager.setDepartment(department);
 
 		// Set the user's role to MANAGER if it's not already
 		if (!manager.getRole().getRoleName().equals(AppRole.MANAGER)) {
@@ -198,8 +206,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 					.orElseThrow(() -> new APIException("MANAGER role not found"));
 			manager.setRole(managerRole);
 		}
-		department.getEmployees().add(manager);
-
+		userRepository.save(manager);
 		return converttoDepartmentDTO(departmentRepository.save(department));
 	}
 
@@ -258,6 +265,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		User employeeUser = userRepository.findByEmail(employee.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("User", "email", employee.getEmail()));
+
+		if(employeeUser.getDepartment() != null) {
+			throw new APIException("First of all, the user must be deleted from " + employeeUser.getDepartment().getName() + ". For this process, please contact the ADMIN or the MANAGER " + (employeeUser.getDepartment().getManager() != null ? employeeUser.getDepartment().getManager().getName() : "") + " working in this department.");
+		}
 
 		if(department.getEmployees().contains(employeeUser)) {
 			throw new APIException("This user is already in this department!");
