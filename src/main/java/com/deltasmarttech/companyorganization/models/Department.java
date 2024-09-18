@@ -57,7 +57,7 @@ public class Department {
 	@OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<User> employees;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "manager_id")
 	private User manager;
 }

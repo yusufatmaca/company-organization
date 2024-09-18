@@ -84,13 +84,27 @@ public class UserOperationServiceImpl implements UserOperationService {
             user.setRole(roleRepository.findByRoleName(AppRole.valueOf(userDTO.getRoleName()))
                     .orElseThrow(() -> new APIException("Invalid role name")));
         }
-        if (userDTO.getCompanyName() != null || userDTO.getDepartmentName() != null) {
+        if (userDTO.getCompanyId() != null && userDTO.getDepartmentId() != null) {
 
-            Company company = companyRepository.findByName(userDTO.getCompanyName()).orElseThrow(() -> new ResourceNotFoundException("Company", "name", userDTO.getCompanyName()));
+            Company company = companyRepository.findById(userDTO.getCompanyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Company", "id", userDTO.getCompanyId()));
 
-            Department department = departmentRepository.findByName(userDTO.getDepartmentName())
-                    .orElseThrow(() -> new ResourceNotFoundException("Department", "name", userDTO.getDepartmentName()));
+            Department department = departmentRepository.findById(userDTO.getDepartmentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
 
+            if (!department.getCompany().equals(company)) {
+                throw new APIException("Mismatch company and department!");
+            }
+            if (user.getRole().getRoleName().name().equalsIgnoreCase("MANAGER")) {
+                Department exDept = departmentRepository.findById(user.getDepartment().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Department", "id", user.getDepartment().getId()));
+
+                exDept.setManager(null);
+                departmentRepository.save(exDept);
+
+                department.setManager(user);
+                departmentRepository.save(department);
+            }
             user.setDepartment(department);
         }
 

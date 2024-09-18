@@ -266,9 +266,6 @@ public class AuthenticationService {
         user.setDepartment(null);
         userRepository.save(user);
 
-
-
-
         return AuthenticationResponse.builder()
                 .token(null)
                 .email(user.getEmail())

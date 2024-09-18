@@ -41,7 +41,6 @@ public class UserOperationsController {
             @RequestBody UserDTO userDTO) {
 
         return new ResponseEntity<>(userOperationService.editUser(userId, userDTO), HttpStatus.OK);
-
     }
 
 }
