@@ -140,7 +140,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 		return departmentResponse;
 	}
 
-
 	@Override
 	public DepartmentDTO deleteDepartment(Integer companyId, Integer departmentId) {
 
@@ -161,20 +160,19 @@ public class DepartmentServiceImpl implements DepartmentService {
 		return departmentDTO;
 	}
 
-
-	public DepartmentDTO assignManager(ManagerDTO manager, Integer companyId, Integer departmentId) {
-
+	@Transactional
+	public DepartmentDTO assignManager(ManagerDTO managerDTO, Integer companyId, Integer departmentId) {
 		Company company = companyRepository.findById(companyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
 
-		if(!company.isActive()) {
+		if (!company.isActive()) {
 			throw new APIException(company.getName() + " is passive!");
 		}
 
 		Department department = departmentRepository.findById(departmentId)
 				.orElseThrow(() -> new ResourceNotFoundException("Department", "id", departmentId));
 
-		if(!department.isActive()) {
+		if (!department.isActive()) {
 			throw new APIException(department.getName() + " is passive!");
 		}
 
@@ -182,26 +180,25 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new IllegalArgumentException("The department does not belong to the given company.");
 		}
 
-		User userManager = userRepository.findByEmail(manager.getEmail())
+		User manager = userRepository.findByEmail(managerDTO.getEmail())
 				.orElseThrow(() -> new APIException("This user cannot be found!"));
 
-		if(!userManager.isActive() || !userManager.isEnabled()) {
+		if (!manager.isActive() || !manager.isEnabled()) {
 			throw new APIException("You cannot make this user a manager because " +
 					"he/she is inactive or has not yet confirmed his/her account.");
 		}
 
-		boolean hasManager = department.getEmployees().stream()
-				.anyMatch(user -> user.getRole().getRoleName().equals(AppRole.MANAGER));
+		// Set the manager for the department
+		department.setManager(manager);
+		manager.getManagedDepartments().add(department);
 
-		if (hasManager) {
-			throw new APIException("This department already has a manager.");
+		// Set the user's role to MANAGER if it's not already
+		if (!manager.getRole().getRoleName().equals(AppRole.MANAGER)) {
+			Role managerRole = roleRepository.findByRoleName(AppRole.MANAGER)
+					.orElseThrow(() -> new APIException("MANAGER role not found"));
+			manager.setRole(managerRole);
 		}
-
-		department.getEmployees().add(userManager);
-
-		userManager.setDepartment(department);
-		userManager.setRole(roleRepository.findByRoleName(AppRole.valueOf("MANAGER")).orElseThrow(() -> new APIException("")));
-		userRepository.save(userManager);
+		department.getEmployees().add(manager);
 
 		return converttoDepartmentDTO(departmentRepository.save(department));
 	}
@@ -227,23 +224,22 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new IllegalArgumentException("The department does not belong to the given company.");
 		}
 
-		boolean hasManager = department.getEmployees().stream()
-				.anyMatch(user -> user.getRole().getRoleName().equals(AppRole.MANAGER));
+		User manager = department.getManager();
 
-		if (!hasManager) {
+		if (manager == null) {
 			throw new APIException("This department does not have a manager. You cannot perform this action.");
 		}
+		department.setManager(null);
+		departmentRepository.save(department);
 
-		List<User> employees = department.getEmployees();
-		User manager = null;
-		for (User employee : employees) {
-			if (employee.getRole().getRoleName().name().equals("MANAGER")) {
-				manager = employee;
-			}
+		List<Department> deptManaged = manager.getManagedDepartments();
+		deptManaged.remove(department);
+
+		if (deptManaged.isEmpty()) {
+			manager.setRole(roleRepository.findByRoleName(AppRole.valueOf("EMPLOYEE")).orElseThrow(() -> new APIException("")));
+		} else {
+			manager.setDepartment(deptManaged.get(0));
 		}
-
-		// department.getEmployees().remove(manager);
-		manager.setRole(roleRepository.findByRoleName(AppRole.valueOf("EMPLOYEE")).orElseThrow(() -> new APIException("")));
 
 		userRepository.save(manager);
 		return converttoDepartmentDTO(departmentRepository.save(department));
@@ -279,7 +275,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 								.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
 
 			if (employeeUser.getRole().getRoleName().name().equalsIgnoreCase("MANAGER")) {
-				throw new APIException("This department has already a manager!");
+				throw new APIException("You can only add users with `EMPLOYEE` role using this service.");
 			}
 			employeeUser.setDepartment(department);
 			userRepository.save(employeeUser);
