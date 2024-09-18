@@ -83,6 +83,10 @@ public class AuthenticationService {
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
 
+        if(!department.isActive()) {
+            throw new APIException("The department is inactive. You cannot perform this action.");
+        }
+
         if (!(checkForDepartmentInCompany(company, department))) {
             throw new APIException(department.getName() + " does not belong " + company.getName() + "!");
         }
@@ -100,10 +104,13 @@ public class AuthenticationService {
             throw new APIException("Error: '" + roleString + "' is not found!");
         }
 
-        Optional<Role> role = roleRepository.findByRoleName(appRole);
+        Role role = roleRepository.findByRoleName(appRole)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", String.valueOf(appRole)));
 
-        if(appRole.name().equalsIgnoreCase("MANAGER")) {
-            checkForManagerInEmployees(department);
+        if(role.getRoleName().name().equalsIgnoreCase("MANAGER")) {
+            if(department.getManager() != null) {
+                throw new APIException("The department has already a 'MANAGER'!");
+            }
         }
 
         User user = User.builder()
@@ -114,13 +121,14 @@ public class AuthenticationService {
                 .password("")
                 .enabled(false)
                 .active(true)
-                .role(role.get())
+                .role(role)
                 .build();
         userRepository.save(user);
 
-        department.getEmployees().add(user);
         if (appRole.name().equalsIgnoreCase("MANAGER")) {
             department.setManager(user);
+        } else if (appRole.name().equalsIgnoreCase("EMPLOYEE")) {
+            department.getEmployees().add(user);
         }
         departmentRepository.save(department);
 
@@ -142,9 +150,7 @@ public class AuthenticationService {
     public void checkForManagerInEmployees(Department department) {
         List<User> employees = department.getEmployees();
 
-        if(!department.isActive()) {
-            throw new APIException("The department is inactive. You cannot perform this action.");
-        }
+
 
         for (User employee : employees) {
             if (employee.getRole().getRoleName().name().equals("MANAGER")) {
