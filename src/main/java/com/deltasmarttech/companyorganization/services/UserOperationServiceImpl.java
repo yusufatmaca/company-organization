@@ -86,36 +86,58 @@ public class UserOperationServiceImpl implements UserOperationService {
                     .orElseThrow(() -> new APIException("Invalid role name")));
         }
 
-        if (userDTO.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(userDTO.getDepartmentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
+        if (userDTO.getCompanyId() != null) {
+            if (userDTO.getDepartmentId() != null) {
 
-            Department exDept = departmentRepository.findById(user.getDepartment().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
-            if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
-                if (exDept.getId() != department.getId()) {
+                Company company = companyRepository.findById(userDTO.getCompanyId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Company", "id", userDTO.getCompanyId()));
+
+                Department department = departmentRepository.findById(userDTO.getDepartmentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
+
+                if (!department.getCompany().getId().equals(userDTO.getCompanyId())) {
+                    throw new APIException("Company / department mismatch!");
+                }
+
+                Department exDept = departmentRepository.findById(user.getDepartment().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
+
+                if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
+                    if (exDept.getId() != department.getId()) {
+                        if (exDept.getManager() != null && exDept.getManager().getId() == user.getId()) {
+                            exDept.setManager(null);
+                        }
+                    }
+                    department.setManager(user);
+                } else if (user.getRole().getRoleName().equals(AppRole.EMPLOYEE)) {
                     if (exDept.getManager() != null && exDept.getManager().getId() == user.getId()) {
                         exDept.setManager(null);
                     }
                 }
-                department.setManager(user);
-            } else if (user.getRole().getRoleName().equals(AppRole.EMPLOYEE)) {
-                if (exDept.getManager() != null && exDept.getManager().getId() == user.getId()) {
-                    exDept.setManager(null);
-                }
-            }
-            user.setDepartment(department);
+                user.setDepartment(department);
 
 
-        } else {
+            } else {
+
+                user.setDepartment(null);
+            /*
             if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
                 user.getDepartment().setManager(user);
             } else if (user.getRole().getRoleName().equals(AppRole.EMPLOYEE)) {
                 if (user.getDepartment().getManager() != null && user.getDepartment().getManager().getId() == user.getId()) {
                     user.getDepartment().setManager(null);
                 }
+
+             */
+            }
+        } else {
+            if (userDTO.getDepartmentId() != null) {
+                throw new APIException("You cannot perform this action because if a user is in a department, then he or she must also be in a company!");
+            } else {
+                user.setDepartment(null);
             }
         }
+
 
         return mapToUserDTO(userRepository.save(user));
     }
