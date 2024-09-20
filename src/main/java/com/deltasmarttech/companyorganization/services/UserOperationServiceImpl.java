@@ -87,10 +87,11 @@ public class UserOperationServiceImpl implements UserOperationService {
         }
 
         if (userDTO.getCompanyId() != null) {
-            if (userDTO.getDepartmentId() != null) {
 
-                Company company = companyRepository.findById(userDTO.getCompanyId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Company", "id", userDTO.getCompanyId()));
+            Company company = companyRepository.findById(userDTO.getCompanyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Company", "id", userDTO.getCompanyId()));
+
+            if (userDTO.getDepartmentId() != null) {
 
                 Department department = departmentRepository.findById(userDTO.getDepartmentId())
                         .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
@@ -116,11 +117,11 @@ public class UserOperationServiceImpl implements UserOperationService {
                 }
                 user.setDepartment(department);
 
-
             } else {
                 String companyName = user.getDepartment().getCompany().getName();
                 Integer companyId = user.getDepartment().getCompany().getId();
                 user.setDepartment(null);
+                userRepository.save(user);
                 return mapToUserDTO(user, companyName, companyId);
             /*
             if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
@@ -169,8 +170,8 @@ public class UserOperationServiceImpl implements UserOperationService {
                 .roleName(user.getRole().getRoleName().name())
                 .companyId(companyId)
                 .companyName(companyName)
-                .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
-                .departmentName(user.getDepartment() != null ? user.getDepartment().getName() : null)
+                .departmentId(null)
+                .departmentName(null)
                 .active(user.isActive())
                 .enabled(user.isEnabled())
                 .build();
