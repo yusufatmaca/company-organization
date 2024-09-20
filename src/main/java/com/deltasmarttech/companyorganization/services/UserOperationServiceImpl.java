@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,32 +85,39 @@ public class UserOperationServiceImpl implements UserOperationService {
             user.setRole(roleRepository.findByRoleName(AppRole.valueOf(userDTO.getRoleName()))
                     .orElseThrow(() -> new APIException("Invalid role name")));
         }
-        if (userDTO.getCompanyId() != null && userDTO.getDepartmentId() != null) {
 
-            Company company = companyRepository.findById(userDTO.getCompanyId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Company", "id", userDTO.getCompanyId()));
-
+        if (userDTO.getDepartmentId() != null) {
             Department department = departmentRepository.findById(userDTO.getDepartmentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
 
-            if (!department.getCompany().equals(company)) {
-                throw new APIException("Mismatch company and department!");
-            }
-            if (user.getRole().getRoleName().name().equalsIgnoreCase("MANAGER")) {
-                Department exDept = departmentRepository.findById(user.getDepartment().getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Department", "id", user.getDepartment().getId()));
-
-                exDept.setManager(null);
-                departmentRepository.save(exDept);
-
+            Department exDept = departmentRepository.findById(user.getDepartment().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Department", "id", userDTO.getDepartmentId()));
+            if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
+                if (exDept.getId() != department.getId()) {
+                    if (exDept.getManager() != null && exDept.getManager().getId() == user.getId()) {
+                        exDept.setManager(null);
+                    }
+                }
                 department.setManager(user);
-                departmentRepository.save(department);
+            } else if (user.getRole().getRoleName().equals(AppRole.EMPLOYEE)) {
+                if (exDept.getManager() != null && exDept.getManager().getId() == user.getId()) {
+                    exDept.setManager(null);
+                }
             }
             user.setDepartment(department);
+
+
+        } else {
+            if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
+                user.getDepartment().setManager(user);
+            } else if (user.getRole().getRoleName().equals(AppRole.EMPLOYEE)) {
+                if (user.getDepartment().getManager() != null && user.getDepartment().getManager().getId() == user.getId()) {
+                    user.getDepartment().setManager(null);
+                }
+            }
         }
 
-        User updatedUser = userRepository.save(user);
-        return mapToUserDTO(updatedUser);
+        return mapToUserDTO(userRepository.save(user));
     }
 
     private UserDTO mapToUserDTO(User user) {
