@@ -118,8 +118,10 @@ public class UserOperationServiceImpl implements UserOperationService {
 
 
             } else {
-
+                String companyName = user.getDepartment().getCompany().getName();
+                Integer companyId = user.getDepartment().getCompany().getId();
                 user.setDepartment(null);
+                return mapToUserDTO(user, companyName, companyId);
             /*
             if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
                 user.getDepartment().setManager(user);
@@ -151,6 +153,22 @@ public class UserOperationServiceImpl implements UserOperationService {
                 .roleName(user.getRole().getRoleName().name())
                 .companyId(user.getDepartment() != null ? user.getDepartment().getCompany().getId() : null)
                 .companyName(user.getDepartment() != null ? user.getDepartment().getCompany().getName() : null)
+                .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
+                .departmentName(user.getDepartment() != null ? user.getDepartment().getName() : null)
+                .active(user.isActive())
+                .enabled(user.isEnabled())
+                .build();
+    }
+
+    private UserDTO mapToUserDTO(User user, String companyName, Integer companyId) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .surname(user.getSurname())
+                .email(user.getEmail())
+                .roleName(user.getRole().getRoleName().name())
+                .companyId(companyId)
+                .companyName(companyName)
                 .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
                 .departmentName(user.getDepartment() != null ? user.getDepartment().getName() : null)
                 .active(user.isActive())
