@@ -424,6 +424,22 @@ public class DepartmentServiceImpl implements DepartmentService {
 		return departmentResponse;
 	}
 
+	@Override
+	public EmployeeResponse showAllAddableUsers(
+			Integer companyId,
+			Integer departmentId,
+			Integer pageNumber,
+			Integer pageSize,
+			String sortBy,
+			String sortOrder) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User managerOrAdmin = userRepository.findByEmail(authentication.getName())
+				.orElse(null);
+
+		return null;
+	}
+
 
 	@Override
 	public EmployeeResponse showAllEmployees(
@@ -496,6 +512,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 		departmentDTO.setCompanyId(department.getCompany().getId());
 		if (department.getManager() != null) {
 			departmentDTO.setManagerId(department.getManager().getId());
+			departmentDTO.setManagerEmail(department.getManager().getEmail());
 		}
 
 		return departmentDTO;

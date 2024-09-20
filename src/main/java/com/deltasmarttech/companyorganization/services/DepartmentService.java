@@ -18,6 +18,6 @@ public interface DepartmentService {
 	AddOrRemoveEmployeeResponse addEmployee(AddOrRemoveEmployeeRequest employee, Integer companyId, Integer departmentId);
 	AddOrRemoveEmployeeResponse deleteEmployee(Integer employeeId, Integer companyId, Integer departmentId);
     DepartmentDTO updateDepartment(Integer companyId, Integer departmentId, DepartmentDTO departmentDTO);
-
 	DepartmentResponse getAllDepartments(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+	EmployeeResponse showAllAddableUsers(Integer companyId, Integer departmentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 }

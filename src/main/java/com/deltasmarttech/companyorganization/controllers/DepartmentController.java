@@ -2,6 +2,7 @@ package com.deltasmarttech.companyorganization.controllers;
 
 import com.deltasmarttech.companyorganization.models.User;
 import com.deltasmarttech.companyorganization.payloads.*;
+import com.deltasmarttech.companyorganization.payloads.Authentication.UserDTO;
 import com.deltasmarttech.companyorganization.payloads.Company.CompanyDTO;
 import com.deltasmarttech.companyorganization.payloads.Department.Employee.AddOrRemoveEmployeeRequest;
 import com.deltasmarttech.companyorganization.payloads.Department.DepartmentDTO;
@@ -100,6 +101,27 @@ public class DepartmentController {
 
 		return new ResponseEntity<>(addOrRemoveEmployeeResponse, HttpStatus.OK);
 	}
+
+	@GetMapping("/manager/companies/{companyId}/departments/{departmentId}/addable-users")
+	public ResponseEntity<EmployeeResponse> showAllAddableUsers(
+			@PathVariable Integer companyId,
+			@PathVariable Integer departmentId,
+			@RequestParam(name="pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+			@RequestParam(name="pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+			@RequestParam(name="sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+			@RequestParam(name="sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder
+	) {
+		EmployeeResponse employeeResponse = departmentService.showAllAddableUsers(
+				companyId,
+				departmentId,
+				pageNumber,
+				pageSize,
+				sortBy,
+				sortOrder);
+
+		return new ResponseEntity<>(employeeResponse, HttpStatus.OK);
+	}
+
 
 	@DeleteMapping("/manager/companies/{companyId}/departments/{departmentId}/employees/{employeeId}")
 	public ResponseEntity<AddOrRemoveEmployeeResponse> deleteEmployee(

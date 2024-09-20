@@ -22,6 +22,7 @@ public class DepartmentDTO {
 	private String town;
 	private String addressDetail;
 	private Integer managerId;
+	private String managerEmail;
 	private DepartmentTypeDTO departmentType;
 	private boolean active;
 }
