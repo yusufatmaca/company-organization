@@ -297,11 +297,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new APIException("You do not have to perform this action.");
 		}
 
-		return new AddOrRemoveEmployeeResponse(employeeUser.getEmail(),
-				employeeUser.getName(),
-				employeeUser.getSurname(),
-				employeeUser.getRole().getRoleName().name());
-
+		return convertToAddOrRemoveEmployeeResponse(employeeUser);
 	}
 
 	@Override
@@ -354,7 +350,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 		return new AddOrRemoveEmployeeResponse(employeeUser.getEmail(),
 				employeeUser.getName(),
 				employeeUser.getSurname(),
-				employeeUser.getRole().getRoleName().name());
+				employeeUser.getRole().getRoleName().name(),
+				employeeUser.getDepartment().getId()
+				);
 	}
 
 	@Override
@@ -400,7 +398,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 	}
 
 	@Override
-	public DepartmentResponse getAllDepartments(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+	public DepartmentResponse getAllDepartments(
+			Integer pageNumber,
+			Integer pageSize,
+			String sortBy,
+			String sortOrder) {
 
 		Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
 				? Sort.by(sortBy).ascending()
@@ -434,10 +436,66 @@ public class DepartmentServiceImpl implements DepartmentService {
 			String sortOrder) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		User managerOrAdmin = userRepository.findByEmail(authentication.getName())
-				.orElse(null);
+		String email = authentication.getName();
+		User currentUser = userRepository.findByEmail(email)
+				.orElseThrow(() -> new APIException("User not found"));
 
-		return null;
+		Sort sort = sortOrder.equalsIgnoreCase("asc")
+				? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
+
+		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+		if (currentUser.getRole().getRoleName() == AppRole.MANAGER) {
+
+			List<Department> managedDepartments = currentUser.getManagedDepartments();
+
+			boolean managesDepartment = managedDepartments.stream()
+					.anyMatch(department -> department.getId().equals(departmentId));
+
+			if (!managesDepartment) {
+				throw new APIException("The department specified is not managed by you.");
+			}
+
+			Page<User> employeePage = userRepository.findByRole_RoleNameAndDepartment_IdNotAndActiveTrueAndEnabledTrue(
+					AppRole.EMPLOYEE, departmentId, pageable);
+
+			return createEmployeeResponse(employeePage);
+		} else if (currentUser.getRole().getRoleName() == AppRole.ADMIN) {
+
+			Page<User> employeePage = userRepository.findByRole_RoleNameAndDepartment_IdNot(AppRole.EMPLOYEE, departmentId, pageable);
+
+			return createEmployeeResponse(employeePage);
+		}
+
+	return null;
+
+	}
+
+	private EmployeeResponse createEmployeeResponse(Page<User> employeePage) {
+		List<AddOrRemoveEmployeeResponse> employeeResponses = employeePage.getContent().stream()
+				.map(this::convertToAddOrRemoveEmployeeResponse)
+				.collect(Collectors.toList());
+
+		EmployeeResponse response = new EmployeeResponse();
+		response.setEmployees(employeeResponses);
+		response.setPageNumber(employeePage.getNumber());
+		response.setPageSize(employeePage.getSize());
+		response.setTotalElements(employeePage.getTotalElements());
+		response.setTotalPages(employeePage.getTotalPages());
+		response.setLastPage(employeePage.isLast());
+
+		return response;
+	}
+
+	private AddOrRemoveEmployeeResponse convertToAddOrRemoveEmployeeResponse(User user) {
+		return new AddOrRemoveEmployeeResponse(
+				user.getEmail(),
+				user.getName(),
+				user.getSurname(),
+				user.getRole().getRoleName().name(),
+				user.getDepartment().getId()
+		);
 	}
 
 

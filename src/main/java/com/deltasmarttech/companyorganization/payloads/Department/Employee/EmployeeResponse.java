@@ -13,9 +13,9 @@ public class EmployeeResponse {
 
     private List<AddOrRemoveEmployeeResponse> employees;
 
-    //private Integer pageNumber;
-    //private Integer pageSize;
-    //private Long totalElements;
-    //private Integer totalPages;
-    //private boolean lastPage;
+    private Integer pageNumber;
+    private Integer pageSize;
+    private Long totalElements;
+    private Integer totalPages;
+    private boolean lastPage;
 }
