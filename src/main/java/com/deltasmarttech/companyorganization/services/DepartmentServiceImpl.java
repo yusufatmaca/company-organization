@@ -426,7 +426,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 		return departmentResponse;
 	}
 
-	@Override
 	public EmployeeResponse showAllAddableUsers(
 			Integer companyId,
 			Integer departmentId,
@@ -440,6 +439,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 		User currentUser = userRepository.findByEmail(email)
 				.orElseThrow(() -> new APIException("User not found"));
 
+		// Sorting setup
 		Sort sort = sortOrder.equalsIgnoreCase("asc")
 				? Sort.by(sortBy).ascending()
 				: Sort.by(sortBy).descending();
@@ -448,28 +448,33 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		if (currentUser.getRole().getRoleName() == AppRole.MANAGER) {
 
+			// Get the list of departments managed by the current user
 			List<Department> managedDepartments = currentUser.getManagedDepartments();
 
+			// Check if the manager is authorized to query for this department
 			boolean managesDepartment = managedDepartments.stream()
 					.anyMatch(department -> department.getId().equals(departmentId));
 
 			if (!managesDepartment) {
-				throw new APIException("The department specified is not managed by you.");
+				throw new APIException("You do not manage this department.");
 			}
 
-			Page<User> employeePage = userRepository.findByRole_RoleNameAndDepartment_IdNotAndActiveTrueAndEnabledTrue(
+			// Fetch employees not in the specified department (to be added to it) or with null department
+			Page<User> employeePage = userRepository.findByRole_RoleNameAndDepartment_IdNotOrDepartmentIsNull(
 					AppRole.EMPLOYEE, departmentId, pageable);
 
 			return createEmployeeResponse(employeePage);
+
 		} else if (currentUser.getRole().getRoleName() == AppRole.ADMIN) {
 
-			Page<User> employeePage = userRepository.findByRole_RoleNameAndDepartment_IdNot(AppRole.EMPLOYEE, departmentId, pageable);
+			// For ADMIN: fetch employees not in the specified department or with null department
+			Page<User> employeePage = userRepository.findByRole_RoleNameAndDepartment_IdNotOrDepartmentIsNull(
+					AppRole.EMPLOYEE, departmentId, pageable);
 
 			return createEmployeeResponse(employeePage);
 		}
 
-	return null;
-
+		throw new APIException("You are not authorized to perform this action.");
 	}
 
 	private EmployeeResponse createEmployeeResponse(Page<User> employeePage) {
@@ -494,7 +499,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 				user.getName(),
 				user.getSurname(),
 				user.getRole().getRoleName().name(),
-				user.getDepartment().getId()
+				user.getDepartment() != null ? user.getDepartment().getId() : null
 		);
 	}
 
