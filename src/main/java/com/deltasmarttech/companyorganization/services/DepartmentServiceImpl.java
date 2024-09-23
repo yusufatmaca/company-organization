@@ -13,15 +13,13 @@ import com.deltasmarttech.companyorganization.repositories.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -515,7 +513,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		User managerOrAdmin = userRepository.findByEmail(authentication.getName())
-				.orElse(null);
+				.orElseThrow(() -> new APIException("User not found"));
 
 		Company company = companyRepository.findById(companyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
@@ -527,22 +525,42 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new APIException("Department does not belong to the specified company");
 		}
 
-		if (!department.getId().equals(managerOrAdmin.getDepartment().getId()) && !managerOrAdmin.getRole().getRoleName().name().equalsIgnoreCase("ADMIN")) {
+		if (!department.getId().equals(managerOrAdmin.getDepartment().getId())
+				&& !managerOrAdmin.getRole().getRoleName().name().equalsIgnoreCase("ADMIN")) {
 			throw new APIException("You do not have permission to access this resource.");
 		}
 
-		EmployeeResponse employeeResponse = new EmployeeResponse();
-		List<AddOrRemoveEmployeeResponse> addOrRemoveEmployeeResponse = department.getEmployees()
-				.stream()
-				.map(employee -> {
-					AddOrRemoveEmployeeResponse response = modelMapper.map(employee, AddOrRemoveEmployeeResponse.class);
-					response.setRole(employee.getRole().getRoleName().name());
-					return response;
-				})
-				.toList();
-		employeeResponse.setEmployees(addOrRemoveEmployeeResponse);
+		List<User> employees = department.getEmployees();
 
-		return employeeResponse;
+		// Sort employees by name based on sortOrder
+		if (sortOrder.equalsIgnoreCase("asc")) {
+			employees.sort(Comparator.comparing(User::getName));
+		} else if (sortOrder.equalsIgnoreCase("desc")) {
+			employees.sort(Comparator.comparing(User::getName).reversed());
+		}
+
+		// Paginate the sorted list
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<User> employeePage = getPaginatedEmployees(employees, pageable);
+
+		return createEmployeeResponse(employeePage);
+	}
+
+	private Page<User> getPaginatedEmployees(List<User> employees, Pageable pageable) {
+		int pageSize = pageable.getPageSize();
+		int currentPage = pageable.getPageNumber();
+		int startItem = currentPage * pageSize;
+
+		List<User> paginatedList;
+
+		if (employees.size() < startItem) {
+			paginatedList = List.of(); // Return an empty list if no items to paginate
+		} else {
+			int toIndex = Math.min(startItem + pageSize, employees.size());
+			paginatedList = employees.subList(startItem, toIndex); // Create sublist for pagination
+		}
+
+		return new PageImpl<>(paginatedList, pageable, employees.size());
 	}
 
 	public DepartmentDTO converttoDepartmentDTO(Department department) {
