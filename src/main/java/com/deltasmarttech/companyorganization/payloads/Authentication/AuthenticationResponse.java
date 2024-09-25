@@ -23,7 +23,5 @@ public class AuthenticationResponse {
     private String companyName;
     private Integer departmentId;
     private String departmentName;
-    private boolean doesProfilePictureExist;
-
 
 }

@@ -10,6 +10,7 @@ import com.deltasmarttech.companyorganization.util.EmailConfirmationToken;
 import com.deltasmarttech.companyorganization.util.JwtUtil;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -197,6 +201,11 @@ public class AuthenticationService {
             throw new APIException("Invalid password.");
         }
 
+        if (user.getProfilePicture() == null) {
+            user.setProfilePicture(AuthenticationService.getDefaultProfilePicture());
+            userRepository.save(user);
+        }
+
         var jwtToken = jwtUtil.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -211,7 +220,6 @@ public class AuthenticationService {
                 .message("Login successful!")
                 .companyId(user.getDepartment().getCompany() != null ? user.getDepartment().getCompany().getId() : null)
                 .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
-                .doesProfilePictureExist(user.doesProfilePictureExist())
                 .build();
 
     }
@@ -322,6 +330,7 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(passwordRequest.getPassword()));
         user.setEnabled(true);
         user.setEmailConfirmationToken(null);
+        user.setProfilePicture(getDefaultProfilePicture());
         userRepository.save(user);
 
         return AuthenticationResponse.builder()
@@ -338,6 +347,26 @@ public class AuthenticationService {
                 .active(user.isActive())
                 .message(user.getName() + " has set successfully password.")
                 .build();
+    }
+
+    public static byte[] getDefaultProfilePicture() {
+        try {
+            URL url = new URL("https://i.pinimg.com/originals/00/1a/2f/001a2f8b19f11da46221298d8df6babe.jpg");
+            InputStream inputStream = url.openStream();
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private boolean isValidPassword(String password) {

@@ -64,6 +64,9 @@ public class User implements UserDetails {
     @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
     private byte[] profilePicture;
 
+    @Transient
+    private static final String DEFAULT_PROFILE_PICTURE_URL = "https://i.pinimg.com/originals/00/1a/2f/001a2f8b19f11da46221298d8df6babe.jpg";
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getRoleName().getAuthorities();
@@ -98,10 +101,6 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    public boolean doesProfilePictureExist() {
-        return getProfilePicture() != null;
     }
 
     @Override
