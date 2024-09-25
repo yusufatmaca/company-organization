@@ -48,7 +48,8 @@ public class SecurityConfig{
                                 "/configuration/security",
                                 "/swagger-ui/**",
                                 "/webjars/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/.well-known/**"
                         )
                         .permitAll()
 
@@ -83,7 +84,7 @@ public class SecurityConfig{
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true); // Allows cookies and authorization headers
-        configuration.addAllowedOrigin("http://localhost:3000"); // Your frontend origin
+        configuration.addAllowedOrigin("https://company-organization-software-gamma.vercel.app/"); // Your frontend origin
         configuration.addAllowedHeader("*"); // Allows all headers
         configuration.addAllowedMethod("*"); // Allows all HTTP methods
 

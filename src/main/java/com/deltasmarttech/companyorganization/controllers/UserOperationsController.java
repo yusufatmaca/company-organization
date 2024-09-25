@@ -1,14 +1,17 @@
 package com.deltasmarttech.companyorganization.controllers;
 
+import com.deltasmarttech.companyorganization.payloads.APIResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.AllUsersResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.UserDTO;
 import com.deltasmarttech.companyorganization.services.UserOperationService;
 import com.deltasmarttech.companyorganization.util.AppConstants;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", maxAge = 3600)
+@CrossOrigin(origins = "https://company-organization-software-gamma.vercel.app/", allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1")
 public class UserOperationsController {
@@ -43,4 +46,18 @@ public class UserOperationsController {
         return new ResponseEntity<>(userOperationService.editUser(userId, userDTO), HttpStatus.OK);
     }
 
+    @PostMapping("/profile/upload-profile-picture")
+    public ResponseEntity<APIResponse> uploadProfilePicture(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(userOperationService.uploadProfilePicture(file), HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/profile-picture")
+    public ResponseEntity<byte[]> getMyProfilePicture() {
+        byte[] profilePicture = userOperationService.getMyProfilePicture();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(profilePicture);
+
+    }
 }

@@ -2,24 +2,23 @@ package com.deltasmarttech.companyorganization.services;
 
 import com.deltasmarttech.companyorganization.exceptions.APIException;
 import com.deltasmarttech.companyorganization.exceptions.ResourceNotFoundException;
-import com.deltasmarttech.companyorganization.models.AppRole;
-import com.deltasmarttech.companyorganization.models.Company;
-import com.deltasmarttech.companyorganization.models.Department;
-import com.deltasmarttech.companyorganization.models.User;
+import com.deltasmarttech.companyorganization.models.*;
+import com.deltasmarttech.companyorganization.payloads.APIResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.AllUsersResponse;
 import com.deltasmarttech.companyorganization.payloads.Authentication.UserDTO;
-import com.deltasmarttech.companyorganization.repositories.CompanyRepository;
-import com.deltasmarttech.companyorganization.repositories.DepartmentRepository;
-import com.deltasmarttech.companyorganization.repositories.RoleRepository;
-import com.deltasmarttech.companyorganization.repositories.UserRepository;
+import com.deltasmarttech.companyorganization.repositories.*;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,6 +142,31 @@ public class UserOperationServiceImpl implements UserOperationService {
 
 
         return mapToUserDTO(userRepository.save(user));
+    }
+
+    @Override
+    public APIResponse uploadProfilePicture(MultipartFile file) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new APIException("User not found"));
+
+        try {
+            user.setProfilePicture(file.getBytes());
+            userRepository.save(user);
+            return new APIResponse("Profile photo uploaded successfully!", true);
+        } catch (IOException e) {
+            throw new APIException("Failed to upload profile photo " + e.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] getMyProfilePicture() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new APIException("User not found"));
+
+        return user.getProfilePicture();
     }
 
     private UserDTO mapToUserDTO(User user) {

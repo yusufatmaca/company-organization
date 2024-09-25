@@ -501,7 +501,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 		);
 	}
 
-
 	@Override
 	public EmployeeResponse showAllEmployees(
 			Integer companyId,

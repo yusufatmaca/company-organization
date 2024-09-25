@@ -98,6 +98,6 @@ public class MailService {
     }
 
     private String generateConfirmationLink(String token, Integer type) {
-        return "http://localhost:3000/set-password?token=" + token + "&type=" + type;
+        return "https://company-organization-software-gamma.vercel.app/set-password?token=" + token + "&type=" + type;
     }
 }

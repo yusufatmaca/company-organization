@@ -211,6 +211,7 @@ public class AuthenticationService {
                 .message("Login successful!")
                 .companyId(user.getDepartment().getCompany() != null ? user.getDepartment().getCompany().getId() : null)
                 .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
+                .doesProfilePictureExist(user.doesProfilePictureExist())
                 .build();
 
     }
