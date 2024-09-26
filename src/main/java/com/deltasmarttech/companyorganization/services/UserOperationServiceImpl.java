@@ -28,12 +28,14 @@ public class UserOperationServiceImpl implements UserOperationService {
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
     private final DepartmentRepository departmentRepository;
+    private final ProfilePictureRepository profilePictureRepository;
 
-    public UserOperationServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CompanyRepository companyRepository, DepartmentRepository departmentRepository) {
+    public UserOperationServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CompanyRepository companyRepository, DepartmentRepository departmentRepository, ProfilePictureRepository profilePictureRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.companyRepository = companyRepository;
         this.departmentRepository = departmentRepository;
+        this.profilePictureRepository = profilePictureRepository;
     }
 
     public AllUsersResponse getAllUsers(
@@ -151,9 +153,12 @@ public class UserOperationServiceImpl implements UserOperationService {
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new APIException("User not found"));
 
+        ProfilePicture profilePicture = profilePictureRepository.findByUserId(user.getId());
+
         try {
-            user.setProfilePicture(file.getBytes());
-            userRepository.save(user);
+            profilePicture.setProfilePicture(file.getBytes());
+            profilePicture.setUser(user);
+            profilePictureRepository.save(profilePicture);
             return new APIResponse("Profile photo uploaded successfully!", true);
         } catch (IOException e) {
             throw new APIException("Failed to upload profile photo " + e.getMessage());
@@ -166,7 +171,9 @@ public class UserOperationServiceImpl implements UserOperationService {
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new APIException("User not found"));
 
-        return user.getProfilePicture();
+        ProfilePicture pp = profilePictureRepository.findByUserId(user.getId());
+
+        return user.getProfilePicture().getProfilePicture();
     }
 
     private UserDTO mapToUserDTO(User user) {

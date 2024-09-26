@@ -33,9 +33,9 @@ public class SecurityConfig{
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply CORS configuration
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((authorize)->authorize
                         .requestMatchers(
                                 "/api/v1/auth/**",
@@ -75,20 +75,22 @@ public class SecurityConfig{
                 )
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true); // Allows cookies and authorization headers
-        configuration.addAllowedOrigin("https://company-organization-software-gamma.vercel.app/"); // Your frontend origin
-        configuration.addAllowedHeader("*"); // Allows all headers
-        configuration.addAllowedMethod("*"); // Allows all HTTP methods
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.addAllowedOrigin("https://company-organization-software-gamma.vercel.app/");
+        configuration.addAllowedOrigin("https://company-organization-software-gamma.vercel.app");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

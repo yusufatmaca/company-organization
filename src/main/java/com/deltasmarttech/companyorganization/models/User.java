@@ -60,9 +60,8 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private EmailConfirmationToken emailConfirmationToken;
 
-    @Lob
-    @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
-    private byte[] profilePicture;
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private ProfilePicture profilePicture;
 
     @Transient
     private static final String DEFAULT_PROFILE_PICTURE_URL = "https://i.pinimg.com/originals/00/1a/2f/001a2f8b19f11da46221298d8df6babe.jpg";

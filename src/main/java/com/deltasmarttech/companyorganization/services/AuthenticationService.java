@@ -11,6 +11,7 @@ import com.deltasmarttech.companyorganization.util.JwtUtil;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,7 @@ public class AuthenticationService {
     private final DepartmentRepository departmentRepository;
     private final EmailConfirmationTokenRepository emailConfirmationTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfilePictureRepository profilePictureRepository;
 
     public AuthenticationService(
             UserRepository userRepository,
@@ -56,7 +58,7 @@ public class AuthenticationService {
             CustomSecurityExpressionRoot securityExpressionRoot,
             CompanyRepository companyRepository,
             DepartmentRepository departmentRepository,
-            EmailConfirmationTokenRepository emailConfirmationTokenRepository, PasswordEncoder passwordEncoder) {
+            EmailConfirmationTokenRepository emailConfirmationTokenRepository, PasswordEncoder passwordEncoder, ProfilePictureRepository profilePictureRepository) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.authManager = authManager;
@@ -67,6 +69,7 @@ public class AuthenticationService {
         this.departmentRepository = departmentRepository;
         this.emailConfirmationTokenRepository = emailConfirmationTokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.profilePictureRepository = profilePictureRepository;
     }
 
 
@@ -201,9 +204,15 @@ public class AuthenticationService {
             throw new APIException("Invalid password.");
         }
 
-        if (user.getProfilePicture() == null) {
-            user.setProfilePicture(AuthenticationService.getDefaultProfilePicture());
-            userRepository.save(user);
+        ProfilePicture pp = profilePictureRepository.findByUserId(user.getId());
+
+        if (pp == null) {
+
+            ProfilePicture profilePicture = new ProfilePicture();
+            profilePicture.setProfilePicture(AuthenticationService.getDefaultProfilePicture());
+            profilePicture.setUser(user);
+            profilePictureRepository.save(profilePicture);
+
         }
 
         var jwtToken = jwtUtil.generateToken(user);
@@ -327,10 +336,13 @@ public class AuthenticationService {
             throw new APIException("The new password cannot be the same as the old password!");
         }
 
+        ProfilePicture profilePicture = new ProfilePicture();
+
+        profilePicture.setProfilePicture(getDefaultProfilePicture());
         user.setPassword(passwordEncoder.encode(passwordRequest.getPassword()));
         user.setEnabled(true);
         user.setEmailConfirmationToken(null);
-        user.setProfilePicture(getDefaultProfilePicture());
+        user.setProfilePicture(profilePicture);
         userRepository.save(user);
 
         return AuthenticationResponse.builder()

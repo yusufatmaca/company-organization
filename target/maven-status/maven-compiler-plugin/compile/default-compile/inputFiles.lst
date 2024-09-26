@@ -87,6 +87,7 @@ C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltas
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\models\Department.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\config\ApplicationConfig.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\services\DepartmentService.java
+C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\models\ProfilePicture.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\payloads\Authentication\ActivateRequest.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\models\Permission.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\payloads\Authentication\SignupDTO.java
@@ -101,5 +102,4 @@ C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltas
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\payloads\Address\Region\RegionResponse.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\payloads\Department\DepartmentResponse.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\services\TownService.java
-C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\controllers\SSLCertificateController.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\repositories\DepartmentRepository.java
