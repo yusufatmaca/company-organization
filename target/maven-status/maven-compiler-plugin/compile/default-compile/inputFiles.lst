@@ -40,6 +40,7 @@ C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltas
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\config\JwtAuthFilter.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\payloads\DepartmentHierarchy\DepartmentHierarchyDTO.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\services\CompanyService.java
+C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\repositories\ProfilePictureRepository.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\models\Region.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\services\MailService.java
 C:\Users\33yus\OneDrive\Masaüstü\company-organization\src\main\java\com\deltasmarttech\companyorganization\util\AppConstants.java
