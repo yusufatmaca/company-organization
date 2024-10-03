@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,6 +84,12 @@ public class UserOperationServiceImpl implements UserOperationService {
             user.setEmail(userDTO.getEmail());
         }
         if (userDTO.getRoleName() != null) {
+            if (userDTO.getRoleName().equalsIgnoreCase("MANAGER")) {
+                Optional<Department> department = departmentRepository.findById(userDTO.getDepartmentId());
+                if (department.isPresent() && department.get().getManager() != null) {
+                    throw new APIException("You cannot assign a MANAGER for this department, because it has already been assigned.");
+                }
+            }
             user.setRole(roleRepository.findByRoleName(AppRole.valueOf(userDTO.getRoleName()))
                     .orElseThrow(() -> new APIException("Invalid role name")));
         }
@@ -119,11 +126,14 @@ public class UserOperationServiceImpl implements UserOperationService {
                 user.setDepartment(department);
 
             } else {
-                String companyName = user.getDepartment().getCompany().getName();
+                /*String companyName = user.getDepartment().getCompany().getName();
                 Integer companyId = user.getDepartment().getCompany().getId();
                 user.setDepartment(null);
                 userRepository.save(user);
                 return mapToUserDTO(user, companyName, companyId);
+
+                 */
+                throw new APIException("Please specify department!");
             /*
             if (user.getRole().getRoleName().equals(AppRole.MANAGER)) {
                 user.getDepartment().setManager(user);
